@@ -1,0 +1,81 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{polski}
+\usepackage{titlesec}
+
+\title{Generator ruchu Google Analytics \\ Iteracja I specyfikacja wymagań}
+\author{Bartłomiej Dalak \and Bartłomiej Karwowski \and Bartosz Gromek \and Tomasz Kanas}
+
+\begin{document}
+\maketitle
+
+\section{Opis ogólny}
+
+Celem tej iteracji jest stworzenie aplikacji generującej statystyki odwiedzania danej strony w danej chwili w Google Analytics.
+
+\section{Wymagania funkcjonalne}
+
+Aplikacja ma umożliwić użytkownikowi przesłanie do Google Analytics statystyk dotyczących odwiedzeń danej strony. Konieczne do tego jest posiadanie przez użytkownika poprawnie skonfigurowanego konta w Google Analytics. Aplikacja ma za zadanie wygenerować w Google Analytics statystyki przedstawiające zdefiniowaną przez użytkownika ilość odwiedzeń strony w przeciągu krótkiego przedziału czasu. Statystyki mają obejmować przeglądarkę odwiedzających i ich lokalizację (w obrębie Polski). Aplikacja będzie całkowicie konsolowa --- nie będzie posiadać graficznego interfejsu. Jedynymi parametrami możliwymi do wyspecyfikowania przez użytkownika (i jednocześnie wymaganymi) są:
+\begin{itemize}
+\item Tracking ID --- identyfikator konta w Google Analytics
+\item URL --- adres strony
+\item ilość odwiedzeń
+\item wielkość przedziału czasu (w ms), mniejsza niż 4 godziny
+\end{itemize}
+
+\subsection{Jakość}
+Generowane przez aplikację statystyki dotyczące lokalizacji i przeglądarek odwiedzających są realistyczne, czyli lokalizacja jest rozłożona po całej Polsce w korelacji z gęstością zamieszkania, natomiast ilość odwiedzeń z konkretnych przeglądarek jest skorelowana z ich popularnością w Polsce. Ilość odwiedzeń rozkłada się równo na całym przedziale czasu. Ponadto statystyki generowane są z pewną wariancją.
+
+\subsection{Przykład użycia}
+Jedyny możliwy sposób użycia aplikacji. Użytkownik uruchamia program z linii poleceń, przekazując mu wymagane argumenty. Po skończeniu działania programu wszystkie oczekiwane statystyki zostały poprawnie wysłane do Google Analytics.
+
+\subsubsection{Aktorzy}
+\begin{itemize}
+\item Użytkownik
+\item Google Analytics
+\end{itemize}
+
+\subsubsection{Dane wejściowe}
+\begin{itemize}
+\item Tracking ID
+\item URL
+\item ilość odwiedzeń
+\item wielkość przedziału czasu (w ms)
+\end{itemize}
+
+\subsubsection{Warunki wstępne}
+\begin{itemize}
+\item Działające połączenie z internetem
+\item Posiadanie strony internetowej
+\item Posiadanie poprawnie skonfigurowanego konta w Google Analytics
+\end{itemize}
+
+\subsubsection{Warunki końcowe}
+Do serwera Google Analytics zostało wysłane dokładnie tyle odwiedzeń ile zostało przekazane jako parametr.
+
+\subsubsection{Rezultat}
+Użytkownik posiada na swoim koncie Google Analytics tyle dodatkowych odwiedzeń ile chciał, uwzględniających lokalizację i przeglądarkę odwiedzających.
+
+\subsubsection{Scenariusz główny}
+\begin{enumerate}
+\item Użytkownik uruchamia program z linii poleceń przekazując mu odpowiednie argumenty
+\item Program weryfikuje poprawność podanych argumentów
+\item Jeśli argumenty były poprawne program wysyła dane do Google Analytics, wypisuje informację o powodzeniu i kończy działanie. W przeciwnym przypadku program wypisuje odpowiedni komunikat o błędzie i kończy działanie.
+\end{enumerate}
+
+\subsubsection{Scenariusz alternatywny}
+Jeśli w trakcie wysyłania danych wystąpiłaby utrata połączenia z internetem, program informuje o tym użytkownika i oczekuje na powrót połączenia. Użytkownik może ręcznie zakończyć pracę programu, wtedy część danych nie zostanie wysłana.
+
+\section{Wymagania niefunkcjonalne}
+
+\subsection{Niezawodność}
+Aplikacja jest zabezpieczona przed tymczasową utratą połączenia z internetem --- nie psuje to generowanych statystyk.
+
+\subsection{Wydajność}
+Aplikacja jest w stanie generować kilka tysięcy odwiedzeń w przeciągu kilku sekund.
+
+\subsection{Bezpieczeństwo}
+Aplikacja nie zapisuje żadnych danych użytkownika i wszystkie dane przesyłane są poprzez szyfrowane połączenie (HTTPS).
+
+\end{document}
