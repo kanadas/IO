@@ -40,7 +40,7 @@ Jedyny możliwy sposób użycia aplikacji. Użytkownik uruchamia program z linii
 \begin{itemize}
 \item Tracking ID
 \item URL
-\item ilość odwiedzeń
+\item liczba odwiedzeń (z góry ustalonego przedziału)
 \item wielkość przedziału czasu (w ms)
 \end{itemize}
 
@@ -67,10 +67,17 @@ Użytkownik posiada na swoim koncie Google Analytics tyle dodatkowych odwiedzeń
 \subsubsection{Scenariusz alternatywny}
 Jeśli w trakcie wysyłania danych wystąpiłaby utrata połączenia z internetem, program informuje o tym użytkownika i oczekuje na powrót połączenia. Użytkownik może ręcznie zakończyć pracę programu, wtedy część danych nie zostanie wysłana.
 
+\subsubsection{Scenariusz neagtywny}
+\begin{enumerate}
+\item Użytkownik jako argument podaje niepoprawną liczbę odwiedzeń (spoza zadanego przedziału). W takiej sytuacji aplikacja wypisuje na standardowe wyjście odpowiedni komunikat i oczekuje nowych danych.
+
+\item Użytkownik podaje poprawne argumenty, jednak liczba odwiedzeń w stosunku do wielkości przedziału czasu jest na tyle duża, że aplikacja nie jest w stanie wygenerować wiarygodnych danych, generujących oczekiwane statystyki. Wiarygodność danych jest określana na podstawie przeciętnego ruchu w sieci na terenie Polski. W takiej sytuacj aplikacja wypisuje na standardowe wyjście odpowiednie ostrzeżenie, z pytaniem czy użytkownik chce zmodyfikować argumenty.
+\end{enumerate}
+
 \section{Wymagania niefunkcjonalne}
 
 \subsection{Niezawodność}
-Aplikacja jest zabezpieczona przed tymczasową utratą połączenia z internetem --- nie psuje to generowanych statystyk.
+Aplikacja jest zabezpieczona przed utratą połączenia z internetem --- wstrzymuje działanie do momentu odzyskania go bądź otrzymania od użytkownika sygnału o zakończeniu pracy. W takiej sytuacji użytkownik zobaczy komunikat, że wygenerowane statystyki mogą być niepełne i nie spełniać jego oczekiwań.
 
 \subsection{Wydajność}
 Aplikacja jest w stanie generować kilka tysięcy odwiedzeń w przeciągu kilku sekund.
