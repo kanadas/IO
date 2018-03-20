@@ -25,7 +25,7 @@ Aplikacja ma umożliwić użytkownikowi przesłanie do Google Analytics statysty
 \end{itemize}
 
 \subsection{Jakość}
-Generowane przez aplikację statystyki dotyczące lokalizacji i przeglądarek odwiedzających są realistyczne, czyli lokalizacja jest rozłożona po całej Polsce w korelacji z gęstością zamieszkania, natomiast ilość odwiedzeń z konkretnych przeglądarek jest skorelowana z ich popularnością w Polsce. Ilość odwiedzeń rozkłada się równo na całym przedziale czasu. Ponadto statystyki generowane są z pewną wariancją.
+Generowane przez aplikację statystyki dotyczące lokalizacji i przeglądarek odwiedzających są realistyczne. Oznacza to, że rozkład generowanych lokalizacji jest zgodny z rozkładem gęstości zamieszkania na terenie Polski, a rozkład przeglądarek --- z ich procentową popularnością w Polsce.
 
 \subsection{Przykład użycia}
 Jedyny możliwy sposób użycia aplikacji. Użytkownik uruchamia program z linii poleceń, przekazując mu wymagane argumenty. Po skończeniu działania programu wszystkie oczekiwane statystyki zostały poprawnie wysłane do Google Analytics.
@@ -69,7 +69,7 @@ Jeśli w trakcie wysyłania danych wystąpiłaby utrata połączenia z internete
 
 \subsubsection{Scenariusz neagtywny}
 \begin{enumerate}
-\item Użytkownik jako argument podaje niepoprawną liczbę odwiedzeń (spoza zadanego przedziału). W takiej sytuacji aplikacja wypisuje na standardowe wyjście odpowiedni komunikat i oczekuje nowych danych.
+	\item Użytkownik jako argument podaje zbyt dużą liczbę odwiedzeń, niepoprawne Tracking ID, lub zbyt duży przedział czasu (powyżej 4h). W takiej sytuacji aplikacja wypisuje na standardowe wyjście odpowiedni komunikat i oczekuje nowych danych.
 
 \item Użytkownik podaje poprawne argumenty, jednak liczba odwiedzeń w stosunku do wielkości przedziału czasu jest na tyle duża, że aplikacja nie jest w stanie wygenerować wiarygodnych danych, generujących oczekiwane statystyki. Wiarygodność danych jest określana na podstawie przeciętnego ruchu w sieci na terenie Polski. W takiej sytuacj aplikacja wypisuje na standardowe wyjście odpowiednie ostrzeżenie, z pytaniem czy użytkownik chce zmodyfikować argumenty.
 \end{enumerate}
@@ -80,7 +80,7 @@ Jeśli w trakcie wysyłania danych wystąpiłaby utrata połączenia z internete
 Aplikacja jest zabezpieczona przed utratą połączenia z internetem --- wstrzymuje działanie do momentu odzyskania go bądź otrzymania od użytkownika sygnału o zakończeniu pracy. W takiej sytuacji użytkownik zobaczy komunikat, że wygenerowane statystyki mogą być niepełne i nie spełniać jego oczekiwań.
 
 \subsection{Wydajność}
-Aplikacja jest w stanie generować kilka tysięcy odwiedzeń w przeciągu kilku sekund.
+Aplikacja jest w stanie generować ponad tysiąc odwiedzeń na sekundę.
 
 \subsection{Bezpieczeństwo}
 Aplikacja nie zapisuje żadnych danych użytkownika i wszystkie dane przesyłane są poprzez szyfrowane połączenie (HTTPS).
