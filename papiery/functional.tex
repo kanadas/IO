@@ -16,7 +16,7 @@ Celem tej iteracji jest stworzenie aplikacji generującej statystyki odwiedzania
 
 \section{Wymagania funkcjonalne}
 
-Aplikacja ma umożliwić użytkownikowi przesłanie do Google Analytics statystyk dotyczących odwiedzeń danej strony. Konieczne do tego jest posiadanie przez użytkownika poprawnie skonfigurowanego konta w Google Analytics. Aplikacja ma za zadanie wygenerować w Google Analytics statystyki przedstawiające zdefiniowaną przez użytkownika ilość odwiedzeń strony w przeciągu podanego przedziału czasu. Statystyki mają obejmować agenta przeglądarki odwiedzających i ich lokalizację (w obrębie Polski). Aplikacja będzie całkowicie konsolowa --- nie będzie posiadać graficznego interfejsu. Jedynymi parametrami możliwymi do wyspecyfikowania przez użytkownika (i jednocześnie wymaganymi) są:
+Aplikacja ma umożliwić użytkownikowi przesłanie do Google Analytics statystyk dotyczących odwiedzeń danej strony. Konieczne do tego jest posiadanie przez użytkownika poprawnie skonfigurowanego konta w Google Analytics. Aplikacja ma za zadanie wygenerować w Google Analytics statystyki przedstawiające zdefiniowaną przez użytkownika ilość odwiedzeń strony w przeciągu podanego przedziału czasu. Statystyki mają obejmować aplikacje klienckie (user agent) i lokalizację użytkowników (w obrębie Polski). Aplikacja będzie całkowicie konsolowa --- nie będzie posiadać graficznego interfejsu. Jedynymi parametrami możliwymi do wyspecyfikowania przez użytkownika (i jednocześnie wymaganymi) są:
 \begin{itemize}
 \item Tracking ID --- identyfikator konta w Google Analytics
 \item URL --- adres strony
@@ -25,7 +25,7 @@ Aplikacja ma umożliwić użytkownikowi przesłanie do Google Analytics statysty
 \end{itemize}
 
 \subsection{Jakość}
-Generowane przez aplikację statystyki dotyczące lokalizacji i przeglądarek odwiedzających są realistyczne. Oznacza to, że rozkład generowanych lokalizacji jest zgodny z rozkładem gęstości zamieszkania na terenie Polski, a rozkład agentów przegladarek odwiedzających --- z ich procentową popularnością w Polsce.
+Generowane przez aplikację statystyki dotyczące lokalizacji i aplikacji klienckich są realistyczne. Oznacza to, że rozkład generowanych lokalizacji jest zgodny z rozkładem gęstości zamieszkania na terenie Polski, a rozkład aplikacji klienckich --- z ich procentową popularnością w Polsce. Ponadto odwiedzenia generowane są liniowo w całym przedziale czasu, z pewną wariancją --- z tego powodu ostateczna ilość odwiedzeń może się nieznacznie różnić od oczekiwanej. Różnica ta nie przekroczy 1\%.
 
 \subsection{Przykład użycia}
 Jedyny możliwy sposób użycia aplikacji. Użytkownik uruchamia program z linii poleceń, przekazując mu wymagane argumenty. Po skończeniu działania programu wszystkie oczekiwane statystyki zostały poprawnie wysłane do Google Analytics.
@@ -66,12 +66,9 @@ Użytkownik posiada na swoim koncie Google Analytics tyle dodatkowych odwiedzeń
 
 \subsubsection{Scenariusz neagtywny}
 \begin{enumerate}
-	\item Użytkownik jako argument podaje nierealną liczbę odwiedzeń w podanym przedziale czasu, niepoprawne Tracking ID. W takiej sytuacji aplikacja wypisuje na standardowe wyjście odpowiedni komunikat i oczekuje nowych danych.
+	\item Użytkownik jako argument podaje nierealną liczbę odwiedzeń w podanym przedziale czasu, niepoprawne Tracking ID\@. W takiej sytuacji aplikacja wypisuje na standardowe wyjście odpowiedni komunikat i oczekuje nowych danych.
 
 \item Użytkownik podaje poprawne argumenty, jednak liczba odwiedzeń w stosunku do wielkości przedziału czasu jest na tyle duża, że aplikacja nie jest w stanie wygenerować wiarygodnych danych, generujących oczekiwane statystyki. Wiarygodność danych jest określana na podstawie przeciętnego ruchu w sieci na terenie Polski. W takiej sytuacj aplikacja wypisuje na standardowe wyjście odpowiednie ostrzeżenie, z pytaniem czy użytkownik chce zmodyfikować argumenty.
-
-\item Google rozpoznaje, że jeden z podanych agentów przeglądarki użytkownika został ręcznie spreparowany. Aplikacja wypisuje na standardowe wyjście informację o problemach i pyta się użytkownika, czy 
-chce on spróbowac jeszcze raz.
 
 \item W trakcie działania zostaje utracone połączenie z internetem. Aplikacja daje użytkownikowi możliwość wyboru jednej z 3 opcji:
 \begin{enumerate}
@@ -85,7 +82,7 @@ chce on spróbowac jeszcze raz.
 \section{Wymagania niefunkcjonalne}
 
 \subsection{Wydajność}
-Aplikacja jest w stanie generować ponad tysiąc odwiedzeń na sekundę na maszynie z procesorem Intel Core i5-4570, 3.2GHz(8GB RAM) i łączem 100 MB/s.
+Aplikacja jest w stanie generować ponad tysiąc odwiedzeń na sekundę na maszynie z procesorem Intel Core i5--4570, 3.2GHz (8GB RAM) i łączem 20 MB/s.
 
 \subsection{Bezpieczeństwo}
 Aplikacja nie zapisuje żadnych danych użytkownika i wszystkie dane przesyłane są poprzez szyfrowane połączenie (HTTPS).
