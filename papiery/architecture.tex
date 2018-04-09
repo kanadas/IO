@@ -33,16 +33,23 @@ Wykorzystany zostanie Python w wersji 3.6.
 \item threading: tworzenie wątku działającego w tle(daemon)
 \end{itemize}
 
+\subsection{send\_requests\_api}
+API służące do komunkacji z GA, generuje potrzebne dane oraz je wysyła.
+
+\subsubsection{Metody}
+\begin{itemize}
+\item send(tracking\_id, url, visits\_no, time): sprawdza czy dane użytkownika mogą zostać wygenerowane, jeśli tak to je generuje  i wysyła do GA. Zwraca jeden z 3 możliwych kodów \{WRONG\_DATA, OK, CONNECTION\_PROBLEM\}.
+\item generate\_data(visits\_no): metoda wołana przez send(), generujące odpowiednie dane do wysłania.
+\end{itemize}
+
 \section{Schemat działania}
 
-\subsection{Wygenerowanie danych}
-Po otrzymaniu danych od użytkownika zostaną wygenerowane dane za pomocą generate\_data\_api.
-
-\includegraphics[scale=0.5]{generate}
-
-\subsection{Wysyłanie danych}
-Będziemy wysyłać dane używając napisanego przez nas API: send\_requests\_api.
+\subsection{Generowanie i wysyłanie danych}
+Dane otrzymane przez użytkownika zostaną przekazane do napisanego przez nas API: send\_requests\_api. API wygeneruje zestaw wejść, które będą wysyłane do GA, a następnie za pomocą biblioteki request wyśle je.
 
 \includegraphics[scale=0.5]{connection_ga}
+
+\subsection{Wykrywanie braku połączenia z internetem}
+Jeśli send\_requests\_api przez 10 min. nie uda się wysłać żadnego requesta do GA API, w takim wypadku zostaje zatrzymane wysyłanie oraz zwrócony do generate\_ga\_traffic komunitka, że ustracono połączenie z internetem. Wtedy użytkownik zostaje o tym poinformawny i może wybrać jedną z trzech możliwości co chce robić dalej.
 
 \end{document}
