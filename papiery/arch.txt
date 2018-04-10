@@ -1,0 +1,21 @@
+send(tracking id, url, visits no, time): sprawdza czy dane użytkownika
+mogą zostać wygenerowane, jeśli tak to przekazuje dane niżej opisanej
+funcji generate_data. Po ponownym ich odebraniu, próbuje przesłać je
+bezpośrednio do GA. Po otrzymaniu (lub nie) odpowiedzi zwraca jeden
+z 3 możliwych kodów {WRONG DATA, OK, CONNECTION PROBLEM}.
+
+generate_data(visits_no): metoda wołana przez send(), generujące odpo-
+wiednie dane do wysłania. Po odebraniu informacji przekazanych przez
+użytkownika, do odpowiedniej ilości zapytań przypisuje dane przygotowane
+z wiarygodnym rozkładem. Informacje do tego potrzebne zostaną zawarte
+bezpośrednio w kodzie funkcji, przy wcześniejszym pobraniu ich przykła-
+dowo ze strony Głównego Urzędu Statystycznego (dane dot. ludności) lub
+GlobalStats StatCounter (dane dot. oprogramowania użytkowników witryny).
+
+
+Generowanie i wysyłanie danych
+Dane otrzymane przez użytkownika skryptowi "generate_ga_traffic.py"
+zostaną przekazane do napisanego przez nas API: send requests api.
+API, z pomocą wyżej opisanej funkcji generate_data, wygeneruje
+zestaw wejść, gotowy już do wysłania do GA. Te dane trafią tam nas-
+tępnie za pomocą biblioteki request.
