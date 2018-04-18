@@ -22,7 +22,7 @@ Dokument architektury systemu ma na celu przedstawienie wizji architektury. Opis
 
 \subsection{Aplikacja}
 
-Aplikacją w naszym przypadku będzie skrypt ``generate\_ga\_traffic.py'', generujący ruch według podanych przez użytkownika wartości. Będzie on uruchamiany przez konsolę.
+Aplikacją w naszym przypadku będzie skrypt \textbf{generate\_ga\_traffic.py}, generujący ruch według podanych przez użytkownika wartości. Będzie on uruchamiany przez konsolę.
 
 \subsubsection{Język}
 
@@ -40,23 +40,41 @@ API służące do komunkacji z GA, sprawdza dane od użytkownika, generuje potrz
 
 \subsubsection{Metody}
 \begin{itemize}
-\item \textbf{send(tracking\_id, url, visits\_no, time)}: sprawdza czy dane użytkownika mogą zostać wygenerowane, za pomocą funkcji \textbf{check\_data}. Jeśli dane przejdą weryfikację to przekazuje je do niżej opisanej funkcji \textbf{generate\_data}. Wpp. zwraca kod WRONG\_DATA. Po odebraniu wygenerowanych danych, próbuje przesłać je bezpośrednio do GA\@. Przykładowe wysłanie danych: \textbf{requests.post("https://www.google-analytics.com/\\collect", data={"v":  1, "t": "pageview", "tid": tracking\_id, "cid": 1, "dp": url})}. W ten sposób będziemy wysyłać w pętli kolejne wejścia z wygenerowanych danych. Zwraca jeden z  2 możliwych kodów {OK, CONNECTION PROBLEM}, w zależności od tego czy udało się wysłać wszystkie dane, czy utracono połączenie.
+\item \textbf{send(tracking\_id, url, visits\_no, time)}: sprawdza czy dane użytkownika mogą zostać wygenerowane, za pomocą funkcji \textbf{check\_data}. Jeśli dane przejdą weryfikację to przekazuje je do niżej opisanej funkcji \textbf{generate\_data}. Wpp. zwraca kod WRONG\_DATA. Po odebraniu wygenerowanych danych, próbuje przesłać je bezpośrednio do GA\@. Przykładowe wysłanie danych: \textbf{requests.post("https://www.google-analytics.com/\\collect", data={"v":  1, "t": "pageview", "tid": tracking\_id, "cid": 1, "dp": url})}. W ten sposób będziemy wysyłać w pętli kolejne wejścia z wygenerowanych danych. Zwraca jeden z  2 możliwych kodów {OK, CONNECTION\_PROBLEM}, w zależności od tego czy udało się wysłać wszystkie dane, czy utracono połączenie.
 
 \item \textbf{check\_data(tracking\_id, url)}: metoda, która wyśle requesta do Measurement Protocol Validation Server za pomocą \textbf{requests.post("https://\\www.google-analytics.com/debug/collect",data={'tid': tracking\_id, 'dp': url, 'v': 1})} i jeśli otrzymany response w formacie JSON w polu ["hitParsingResult"][0]["valid"] zawiera wartość true to zwróci tuple(true, []), wpp. zwróci tuple(false, parameters), gdzie parameters to lista błędnych parametrów, które otrzymamy z pól ["hitParsingResult"][0]["parserMessege"] [i]["parameter"], gdzie i to indeks złego parametru.
 
-\item \textbf{generate\_data(visits\_no)}: metoda wołana przez \textbf{send()}, generujące odpowiednie dane do wysłania. Po odebraniu informacji przekazanych przez użytkownika, do odpowiedniej ilości zapytań przypisuje dane przygotowane z wiarygodnym rozkładem. Informacje do tego potrzebne zostaną zczytane z pliku `browser.csv', który zostanie pobrany ze strony \href{http://gs.statcounter.com/browser-version-market-share/all/poland#monthly-201703-201803-bar}{GlobalStats StatCounter (dane\ dot.\ oprogramowania\ użytkowników\ witryny)}. Wykres użytkowania przeglądarek na terenie Polski.
+\item \textbf{generate\_data(visits\_no)}: metoda wołana przez \textbf{send()}, generujące odpowiednie dane do wysłania. Po odebraniu informacji przekazanych przez użytkownika, do odpowiedniej ilości zapytań przypisuje dane przygotowane z wiarygodnym rozkładem. Informacje do tego potrzebne zostaną zczytane z pliku `browser.csv', który zostanie pobrany ze strony \href{http://gs.statcounter.com/browser-version-market-share/all/poland#monthly-201703-201803-bar}{GlobalStats StatCounter (dane\ dot.\ oprogramowania\ użytkowników\ witryny)}. Informacje te zostaną przypisane na zmienną \textbf{distribution\_informations} będącą typu DataFrame. Zostanie to wykonane tylko raz.
 
-\begin{center}\includegraphics[scale=0.3]{chart}\end{center}
 \end{itemize}
+
+\subsection{Wykres użytkowania przeglądarek na terenie Polski}
+\begin{center}\includegraphics[scale=0.25]{chart}\end{center}
 
 \section{Schemat działania}
 
-\subsection{Generowanie i wysyłanie danych}
-Dane otrzymane przez użytkownika zostaną przekazane do napisanego przez nas API: \textbf{send\_requests\_api}. API sprawdzi czy otrzymane dane od użytkownika są poprawne, wygeneruje zestaw wejść, które będą wysyłane do GA, a następnie za pomocą metody post z biblioteki \textbf{requests} wyśle je. 
+\subsubsection{Przekazanie danych}
+Użytkownika wywołuję funkcję \textbf{send(tracking\_id, url, visits\_no, time)} udostępnioną przez \textbf{send\_requests\_api}. W rezultacie otrzymuje komunikat tego czy udało się pomyślnie wysłać żądanie.
 
-\begin{center}\includegraphics[scale=0.5]{connection_ga}\end{center}
+\begin{center}\includegraphics[scale=0.5]{put_data}\end{center}
+
+\subsection{Sprawdzenie poprawności danych}
+API po uzyskaniu danych od użytkownika wywołuje funkcję \textbf{check\_data} sprawdzającą czy podany tracking\_id i url 
+są poprawne. Jeśli nie są to API zwróci komunikat {WRONG\_DATA}.
+
+\begin{center}\includegraphics[scale=0.5]{check_data}\end{center}
+
+\subsection{Wygenerowanie danych}
+Jeśli dane od użytkownika są poprawne to zostaje wywołana funkcja \textbf{generate\_data}, która generuje i zwraca dane. 
+
+\begin{center}\includegraphics[scale=0.5]{generate_data}\end{center}
+
+\subsection{Wysyłanie danych i zwrócenie komunikatu}
+Po otrzymaniu wygenerowanych danych zostają one wysyłane do Google Analytics, a następnie zostaje zwrócony komunikat powodzenia.
+
+\begin{center}\includegraphics[scale=0.5]{send_data}\end{center}
 
 \subsection{Wykrywanie braku połączenia z internetem}
-Jeśli \textbf{send\_requests\_api} przez 10 min\. nie uda się wysłać żadnego requesta do GA API, bądź nie uzyskamy odpowiedzi, w takim wypadku zostaje zatrzymane wysyłanie oraz zwrócony do \textbf{generate\_ga\_traffic} komunikat CONNECTION\_PROBLEM\@. Wtedy użytkownik zostaje o tym poinformowany i może wybrać jedną z trzech możliwości co chce robić dalej.
+Jeśli \textbf{send\_requests\_api} przez 10 min. nie uda się wysłać żadnego requesta do GA API, bądź nie uzyskamy odpowiedzi, w takim wypadku zostaje zatrzymane wysyłanie oraz zwrócony do \textbf{generate\_ga\_traffic} komunikat CONNECTION\_PROBLEM\@. Wtedy użytkownik zostaje o tym poinformowany i może wybrać jedną z trzech możliwości co chce robić dalej.
 
 \end{document}
