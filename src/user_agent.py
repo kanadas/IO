@@ -2,6 +2,7 @@ import numpy as np
 import csv
 import json
 import random
+from bisect import bisect
 
 class Distribution:
     def __init__(self, devices, op_sys, op_sys_ver, browsers, browser_ver):
@@ -17,43 +18,57 @@ def load_statistics():
     devices = []
     with open('../data/devices.csv', 'r', encoding='utf-8') as f:
         freader = csv.reader(f, dialect='excel', delimiter=',')
-        devices = [(row[0].replace('"', '').lower(), float(row[1])) for row in freader]
+        devices = [[row[0].replace('"', '').lower(), float(row[1])] for row in freader]
     op_sys = {}
     op_sys_ver = {}
     browsers = {}
     browser_ver = {}
-    for dev in devices[:][0]:
-        with open('../data/os-' + dev, 'r', encoding='utf-8') as f:
-            freader = csv.reader(f, dialect='excel', delimeter=',')
-            op_sys[dev] = np.array([[row[0].strip().replace('"', '').lower(), float(row[1])] for row in freader])
+    for device in devices:
+        dev = device[0]
+        with open('../data/os-' + dev + '.csv', 'r', encoding='utf-8') as f:
+            freader = csv.reader(f, dialect='excel', delimiter=',')
+            op_sys[dev] = [[row[0].strip().replace('"', '').lower(), float(row[1])] for row in freader]
         op_sys_ver[dev] = {}
-        for os in op_sys[dev].items()[:,0]:
-            with open('../data/' + os + '-version-' + dev, 'r', encoding='utf-8') as f:
-                freader = csv.reader(f, dialect='excel', delimeter=',')
-                op_sys_ver[dev][os] = np.array([[row[0].strip().replace('"', '').lower(), float(row[1])] for row in freader])
-        with open('../data/browser-' + dev, 'r', encoding='utf-8') as f:
-            freader = csv.reader(f, dialect='excel', delimeter=',')
-            browsers[dev] = np.array([[row[0].strip().replace('"', '').lower(), float(row[1])] for row in freader])
+        for operationsystem in op_sys[dev]:
+            os = operationsystem[0]
+            with open('../data/' + os + '-version-' + dev + '.csv', 'r', encoding='utf-8') as f:
+                freader = csv.reader(f, dialect='excel', delimiter=',')
+                op_sys_ver[dev][os] = [[row[0].strip().replace('"', '').lower(), float(row[1])] for row in freader]
+        with open('../data/browser-' + dev + '.csv', 'r', encoding='utf-8') as f:
+            freader = csv.reader(f, dialect='excel', delimiter=',')
+            browsers[dev] = [[row[0].strip().replace('"', '').lower(), float(row[1])] for row in freader]
     with open('../data/browser-version.csv', 'r', encoding='utf-8') as f:
-        freader = csv.reader(r, dialect='excel', dilimeter=',')
+        freader = csv.reader(f, dialect='excel', delimiter=',')
         for row in freader:
             name = row[0].strip().replace('"', '').lower()
-            brow = name[:name.rfind(' ') - 1]
+            brow = name[:name.rfind(' ')]
             ver = name[name.rfind(' ') + 1:]
-            if not browser_ver.has_key(brow): browser_ver[brow] = []
-            browser_ver[brow].append((ver, float(row[1])))
+            if not brow in browser_ver: browser_ver[brow] = []
+            browser_ver[brow].append([ver, float(row[1])])
+
+    #some debug printing
+    #print('Devices:')
+    #print(devices)
+    #print('Operation systems:')
+    #print(op_sys)
+    #print('systems versions:')
+    #print(op_sys_ver)
+    #print('browsers:')
+    #print(browsers)
+    #print(browser_ver)
+
 
     #counting prefix sums of propabilities - helps in generating
-    devices = np.cumsum(devices[key], axis = [0, 1])
+    for i in range(1, len(devices)): devices[i][1] = devices[i][1] + devices[i-1][1]
     for key in op_sys:
-        op_sys[key] = np.cumsum(op_sys[key], axis = [0, 1])
+        for i in range(1, len(op_sys[key])): op_sys[key][i][1] += op_sys[key][i-1][1]
     for key in op_sys_ver:
         for key2 in op_sys_ver[key]:
-            op_sys_ver[key][key2] = np.cumsum(op_sys_ver[key][key2], axis = [0, 1])
+            for i in range(1, len(op_sys_ver[key][key2]) - 1): op_sys_ver[key][key2][i][1] += op_sys_ver[key][key2][i-1][1]
     for key in browsers:
-        browsers[key] = np.cumsum(browsers[key], axis = [0, 1])
+        for i in range(1, len(browsers[key])): browsers[key][i][1] += browsers[key][i-1][1]
     for key in browser_ver:
-        browser_ver[key] = np.cumsum(browser_ver[key], axis = [0, 1])
+        for i in range(1, len(browser_ver[key])): browser_ver[key][i][1] += browser_ver[key][i-1][1]
 
     return Distribution(devices, op_sys, op_sys_ver, browsers, browser_ver)
     
@@ -68,19 +83,19 @@ def generate_user_agents(dist, n):
     agents = []
     for i in range(n):
         r = random.uniform(0, dist.devices[-1][1])
-        dev = dist.devices[np.searchsorted(dist.devices[:,1], r)][0]
-        systems = dist.op_sys[dev][:,1]
+        device = dist.devices[bisect([el[1] for el in dist.devices], r)][0]
+        systems = [el[1] for el in dist.op_sys[device]]
         r = random.uniform(0, systems[-1])
-        sys = dist.op_sys[dev][np.searchsorted(systems, r)][0]
-        versions = dist.op_sys_ver[dev][sys][:,1]
+        sys = dist.op_sys[device][bisect(systems, r)][0]
+        versions = [el[1] for el in dist.op_sys_ver[device][sys]]
         r = random.uniform(0, versions[-1])
-        sys_ver = dist.op_sys_ver[dev][sys][np.searchsorted(versions, r)][0]
-        browsers = dist.browsers[dev][:,1]
+        sys_ver = dist.op_sys_ver[device][sys][bisect(versions, r)][0]
+        browsers = [el[1] for el in dist.browsers[device]]
         r = random.uniform(0, browsers[-1])
-        browser = dist.browsers[dev][np.searchsorted(browsers, r)][0]
-        browser_versions = dist.browser_ver[browser][:,1]
+        browser = dist.browsers[device][bisect(browsers, r)][0]
+        browser_versions = [el[1] for el in dist.browser_ver[browser]]
         r = random.uniform(0, browser_versions[-1])
-        brow_ver = dist.browser_ver[browser][np.searchsorted(browser_versions, r)][0]
+        brow_ver = dist.browser_ver[browser][bisect(browser_versions, r)][0]
         
         ua = 'Mozilla/5.0 '
         if device == 'desktop':
@@ -98,7 +113,7 @@ def generate_user_agents(dist, n):
             elif sys == "macos":
                 ua = ua + '(Macintosh;'
                 #I dont have statistics for this 0.2 - just guessing
-                if random.random > 0.2: ua = ua + ' Intel '
+                if random.random() > 0.2: ua = ua + ' Intel '
                 else: ua = ua + ' PPC '
                 ua = ua + 'Mac OS X '
                 if sys_ver == 'macos sierra': ua = ua + '10.12'
@@ -108,7 +123,7 @@ def generate_user_agents(dist, n):
                 ua = ua + 'X11; Linux '
                 if sys_ver == 'x86_64':
                     #I dont have statistics for this 0.2 - just guessing
-                    if random.random > 0.2: ua = ua + 'x86_64'
+                    if random.random() > 0.2: ua = ua + 'x86_64'
                     else: ua = ua + 'i686 on x86_64'
                 else: ua = ua + 'i686'
             #i treat all IE's as IE 11, because earlier versions are very rare, and very different
@@ -126,7 +141,7 @@ def generate_user_agents(dist, n):
                 if device == 'mobile': ua = ua + '(iPhone; '
                 else: ua = ua + '(iPad; '
                 ua = ua + 'CPU iPhone OS ' + sys_ver[4:] + ' like Mac OS X)'
-            ua = ua + 'AppleWebKit/537.36 (KHTML, like Gecko) '
+            ua = ua + ' AppleWebKit/537.36 (KHTML, like Gecko) '
             if browser == 'samsung internet': ua = ua + 'SamsungBrowser/' + brow_ver + ' Chrome/56.0.2924.87'
             if browser == 'chrome':
                 if sys == 'ios': ua = ua + ' CriOS'
@@ -140,4 +155,6 @@ def generate_user_agents(dist, n):
         agents.append(ua)
     return agents
 
-generate_user_agents(load_statistics(), 100)
+import pprint
+pp = pprint.PrettyPrinter(indent=4, width=150)
+pp.pprint(generate_user_agents(load_statistics(), 100))
