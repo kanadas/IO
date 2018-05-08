@@ -2,6 +2,7 @@ import requests
 import uuid
 import time
 from constants import WRONG_DATA, OK, CONNECTION_PROBLEM
+from users import generate_users
 
 
 def check_data(tracking_id, url):
@@ -21,9 +22,8 @@ def check_data(tracking_id, url):
         return False, WRONG_DATA
 
 
-#to narazie zeby sprawdzic czy dziala
 def generate_data(visits_no):
-    return [{"agent": "Opera/9.80 (Windows NT 6.0) Presto/2.12.388 Version/12.1"} for _ in range(visits_no)]
+    return generate_users(visits_no)
 
 
 def send(tracking_id, url, visits_no, sending_time):
@@ -31,23 +31,22 @@ def send(tracking_id, url, visits_no, sending_time):
 
     if correct:
         data = generate_data(visits_no)
-        batch_size = len(data) // sending_time
 
-        for i in range(sending_time):
-            for id, user in enumerate(data[i:i + batch_size]):
-                try:
-                    requests.post("https://www.google-analytics.com/collect", data = {
-                        "v": 1,
-                        "tid": tracking_id,
-                        "cid": uuid.uuid4(),
-                        "dp": url,
-                        "ua": user["agent"] # nie wiem jak beda wygenerowani uzytkownicy
-                    }, timeout=60)
-                except (requests.Timeout, requests.ConnectionError):
-                    return CONNECTION_PROBLEM, i * batch_size + 1 + id, i + 1
-            time.sleep(1)
+        for id, user in enumerate(data):
+            try:
+                requests.post("https://www.google-analytics.com/collect", data={
+                    "v": 1,
+                    "tid": tracking_id,
+                    "cid": user.cid,
+                    "dp": url,
+                    "ua": user.agent,
+                    "geoid": user.geoid
+                }, timeout=60)
+            except (requests.Timeout, requests.ConnectionError):
+                return CONNECTION_PROBLEM, id
+            time.sleep(sending_time / visits_no)
 
-        return OK, visits_no, sending_time
+        return OK, visits_no
     else:
-        return result, 0, 0
+        return result, 0
 

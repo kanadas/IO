@@ -155,6 +155,6 @@ def generate_user_agents(dist, n):
         agents.append(ua)
     return agents
 
-import pprint
-pp = pprint.PrettyPrinter(indent=4, width=150)
-pp.pprint(generate_user_agents(load_statistics(), 100))
+# import pprint
+# pp = pprint.PrettyPrinter(indent=4, width=150)
+# pp.pprint(generate_user_agents(load_statistics(), 100))

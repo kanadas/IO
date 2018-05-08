@@ -33,7 +33,7 @@ def decide():
 
 if __name__ == '__main__':
     if len(sys.argv) != 5:
-        print("Wrong parameters number.\nUsage: python generate_ga_traffic.py tracking_id url vists_no time.")
+        print("Wrong parameters number.\nUsage: python generate_ga_traffic.py tracking_id url visits_no time.")
     else:
         tracking_id = sys.argv[1]
         url = sys.argv[2]
@@ -44,16 +44,15 @@ if __name__ == '__main__':
         all_time = 0
 
         while sending:
-            result, sent_users, sent_time = send(tracking_id, url, visits_no - all_sent, time - all_time)
+            result, sent_users = send(tracking_id, url, visits_no - all_sent, time - all_time)
             all_sent += sent_users
-            all_time += sent_time
 
             if result == OK:
                 sending = False
-                print("Successfully send %d/%d users." % (all_sent, visits_no))
+                print("Successfully sent %d/%d users." % (all_sent, visits_no))
             elif result == WRONG_DATA:
                 sending = False
                 print("Tracking_id is wrong.")
-            else: #CONNECTION_PROBLEM
+            else: # CONNECTION_PROBLEM
                 print("Connection problem.")
                 sending, option = decide()
