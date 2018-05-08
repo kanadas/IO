@@ -41,10 +41,9 @@ if __name__ == '__main__':
         time = int(sys.argv[4])
         sending = True
         all_sent = 0
-        all_time = 0
 
         while sending:
-            result, sent_users = send(tracking_id, url, visits_no - all_sent, time - all_time)
+            result, sent_users = send(tracking_id, url, visits_no - all_sent, time)
             all_sent += sent_users
 
             if result == OK:
