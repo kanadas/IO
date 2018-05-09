@@ -46,18 +46,6 @@ def load_statistics():
             if not brow in browser_ver: browser_ver[brow] = []
             browser_ver[brow].append([ver, float(row[1])])
 
-    #some debug printing
-    #print('Devices:')
-    #print(devices)
-    #print('Operation systems:')
-    #print(op_sys)
-    #print('systems versions:')
-    #print(op_sys_ver)
-    #print('browsers:')
-    #print(browsers)
-    #print(browser_ver)
-
-
     #counting prefix sums of propabilities - helps in generating
     for i in range(1, len(devices)): devices[i][1] = devices[i][1] + devices[i-1][1]
     for key in op_sys:
@@ -155,6 +143,3 @@ def generate_user_agents(dist, n):
         agents.append(ua)
     return agents
 
-# import pprint
-# pp = pprint.PrettyPrinter(indent=4, width=150)
-# pp.pprint(generate_user_agents(load_statistics(), 100))

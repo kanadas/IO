@@ -2,7 +2,7 @@ import sys
 import requests
 from send_requests_api import send
 from constants import WRONG_DATA, OK, CONNECTION_PROBLEM, EMPTY_OPTION, WAIT_NEW_SENDING, WAIT_CONTINUE_SENDING,\
-    STOP_SENDING
+    STOP_SENDING, MAX_REQUESTS_PER_MINUTE 
 
 
 def internet_on():
@@ -38,20 +38,24 @@ if __name__ == '__main__':
         tracking_id = sys.argv[1]
         url = sys.argv[2]
         visits_no = int(sys.argv[3])
-        time = int(sys.argv[4])
+        time = int(sys.argv[4]) * 60
         sending = True
         all_sent = 0
 
-        while sending:
-            result, sent_users = send(tracking_id, url, visits_no - all_sent, time)
-            all_sent += sent_users
+        if visits_no / time > MAX_REQUESTS_PER_MINUTE:
+            print("We can't generate so much visits in that time")
 
-            if result == OK:
-                sending = False
-                print("Successfully sent %d/%d users." % (all_sent, visits_no))
-            elif result == WRONG_DATA:
-                sending = False
-                print("Tracking_id is wrong.")
-            else: # CONNECTION_PROBLEM
-                print("Connection problem.")
-                sending, option = decide()
+        else:
+            while sending:
+                result, sent_users = send(tracking_id, url, visits_no - all_sent, time)
+                all_sent += sent_users
+
+                if result == OK:
+                    sending = False
+                    print("Successfully sent %d/%d users." % (all_sent, visits_no))
+                elif result == WRONG_DATA:
+                    sending = False
+                    print("Tracking_id is wrong.")
+                else: # CONNECTION_PROBLEM
+                    print("Connection problem.")
+                    sending, option = decide()
