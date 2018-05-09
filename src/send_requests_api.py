@@ -1,7 +1,6 @@
 import requests
 import random
 from math import floor, ceil
-import uuid
 import time
 from constants import WRONG_DATA, OK, CONNECTION_PROBLEM
 from users import generate_users
@@ -33,12 +32,13 @@ def send(tracking_id, url, visits_no, sending_time):
 
     if correct:
         data = generate_data(visits_no)
-        batch_size = len(data) // sending_time
-        ak = 0;
+        counter = 0;
         for i in range(sending_time):
-            num = random.randint(floor((len(data) - ak) / (sending_time - i) / 1.5), ceil((len(data) - ak) / (sending_time - i) * 1.5))
-            if i == sending_time - 1: num = len(data) - ak
-            for id, user in enumerate(data[ak : ak + num]):
+            num = random.randint(floor((len(data) - counter) / (sending_time - i) / 1.5),
+                                 ceil((len(data) - counter) / (sending_time - i) * 1.5))
+            if i == sending_time - 1:
+                num = len(data) - counter
+            for id, user in enumerate(data[counter : counter + num]):
                 try:
                     requests.post("https://www.google-analytics.com/collect", data={
                         "v": 1,
@@ -51,10 +51,9 @@ def send(tracking_id, url, visits_no, sending_time):
                 except (requests.Timeout, requests.ConnectionError):
                     return CONNECTION_PROBLEM, id
 
-            ak += num
+            counter += num
             while time.clock() % 1 > 0.01:
                 pass
-            #time.sleep(1)
 
         return OK, visits_no
     else:
