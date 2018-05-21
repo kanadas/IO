@@ -11,24 +11,32 @@
 \maketitle
 
 \section{Opis ogólny}
-
-Celem tej iteracji jest stworzenie aplikacji generującej statystyki odwiedzania danej strony w podanym przez użytownika przedziale czasu w Google Analytics.
+\begin{itemize}
+\item Celem pierwszej iteracji jest napisanie skryptu generującego statystyki odwiedzania danej strony w podanym przez użytownika przedziale czasu w Google Analytics.
+\item Celem drugiej iteracji jest stworzenie systemu kolejkowania uruchomień skryptu o określonej godzinie, wraz z interfejsem użytkownika w postaci aplikacji webowej.
+\end{itemize}
 
 \section{Wymagania funkcjonalne}
 
-Aplikacja ma umożliwić użytkownikowi przesłanie do Google Analytics statystyk dotyczących odwiedzeń danej strony. Konieczne do tego jest posiadanie przez użytkownika poprawnie skonfigurowanego konta w Google Analytics. Aplikacja ma za zadanie wygenerować w Google Analytics statystyki przedstawiające zdefiniowaną przez użytkownika ilość odwiedzeń strony w przeciągu podanego przedziału czasu. Statystyki mają obejmować aplikacje klienckie (user agent) i lokalizację użytkowników (w obrębie Polski). Aplikacja będzie całkowicie konsolowa --- nie będzie posiadać graficznego interfejsu. Jedynymi parametrami możliwymi do wyspecyfikowania przez użytkownika (i jednocześnie wymaganymi) są:
+Aplikacja ma umożliwić użytkownikowi przesłanie do Google Analytics statystyk dotyczących odwiedzeń danej strony. Konieczne do tego jest posiadanie przez użytkownika poprawnie skonfigurowanego konta w Google Analytics. Aplikacja ma za zadanie wygenerować w Google Analytics statystyki przedstawiające zdefiniowaną przez użytkownika ilość odwiedzeń strony w przeciągu podanego przedziału czasu. Statystyki mają obejmować aplikacje klienckie (user agent) i lokalizację użytkowników (w obrębie Polski). Aplikacja posiadać będzie prosty formularz do dodawania tasków reprezentujących pojedyńcze uruchomienie skryptu w określonym dniu i godzinie. Użytkownik podaje w formularzu:
 \begin{itemize}
 \item Tracking ID --- identyfikator konta w Google Analytics
-\item URL --- adres strony
-\item ilość odwiedzeń
-\item wielkość przedziału czasu (w s)
+\item URL --- względny adres strony, tzn. adres podstrony (url'a przypisanego do Tracking ID), która ma mieć zarejestrowane wyświetlenia.
+\item Ilość odwiedzeń
+\item Wielkość przedziału czasu (w s)
+\item Datę i godzinę.
 \end{itemize}
 
 \subsection{Jakość}
 Generowane przez aplikację statystyki dotyczące lokalizacji i aplikacji klienckich są realistyczne. Oznacza to, że rozkład generowanych lokalizacji jest zgodny z rozkładem gęstości zamieszkania na terenie Polski, a rozkład aplikacji klienckich --- z ich procentową popularnością w Polsce. Ponadto odwiedzenia generowane są liniowo w całym przedziale czasu, z pewną wariancją --- z tego powodu ostateczna ilość odwiedzeń może się nieznacznie różnić od oczekiwanej. Różnica ta nie przekroczy 1\%.
 
 \subsection{Przykład użycia}
-Jedyny możliwy sposób użycia aplikacji. Użytkownik uruchamia program z linii poleceń, przekazując mu wymagane argumenty. Po skończeniu działania programu wszystkie oczekiwane statystyki zostały poprawnie wysłane do Google Analytics.
+\begin{itemize}
+\item Dodanie nowego taska. Użytkownik wypełnia formularz na stronie, po czym klika przycisk 'add new'. W tabeli tasków pojawia się nowy wiersz zawierający
+    id zlecenia, datę, liczbę wyświetleń, czas ich generowania oraz url strony dla której mają być przesłane. Jeśli skrypt wysyłający dane do GA nie zwróci żadnych błędów, to w momencie zakończenia generowania wyświetleń task zmieni status na 'Done', w przeciwnym wypadku jego status zmieni się na 'Error occured'.
+\item Edycja taska. Dopóki task ma status 'Ready', to użytkownik może edytować jego wszystkie właściwości (poza id taska). Edycja następuje poprzez modyfikację pól w tabeli i kliknięcie przycisku 'save'.
+\item Usunięcie taska. Przy każdym wierszu w tabeli, gdzie status jest 'Ready' albo 'In progress', aktywny jest przycisk w kształcie krzyżyka pozwalający na usunięcie/zatrzymanie działania taska (w zależności od jego statusu). Task ze statusu 'Ready' zmienia się na 'Deleted', 'In progress' na 'Canceled'.
+\end{itemize}
 
 \subsubsection{Aktorzy}
 \begin{itemize}
@@ -40,8 +48,9 @@ Jedyny możliwy sposób użycia aplikacji. Użytkownik uruchamia program z linii
 \begin{itemize}
 \item Tracking ID
 \item URL
-\item liczba odwiedzeń (z góry ustalonego przedziału)
-\item wielkość przedziału czasu (w s)
+\item Liczba odwiedzeń (z góry ustalonego przedziału)
+\item Wielkość przedziału czasu (w s)
+\item Data i godzina uruchomienia skryptu.
 \end{itemize}
 
 \subsubsection{Warunki wstępne}
@@ -59,23 +68,18 @@ Użytkownik posiada na swoim koncie Google Analytics tyle dodatkowych odwiedzeń
 
 \subsubsection{Scenariusz główny}
 \begin{enumerate}
-\item Użytkownik uruchamia program z linii poleceń przekazując mu odpowiednie argumenty
-\item Program weryfikuje poprawność podanych argumentów
-\item Jeśli argumenty były poprawne program wysyła dane do Google Analytics, wypisuje informację o powodzeniu i kończy działanie. W przeciwnym przypadku program wypisuje odpowiedni komunikat o błędzie i kończy działanie.
+\item Użytkownik wchodzi na stronę i wypełnia formularz.
+\item Strona weryfikuje poprawność danych. Jeśli nie są poprawne to wypisywany jest stosowny komunikat.
+\item W przeciwnym przypadku w tabeli pojawia się nowy wiersz ze statusem 'Ready'. W danym przez użytkownika dniu i godzinie uruchamiany jest skrypt z odpowiednimi argumentami. Wtedy status  w tabeli zmienia się na 'Ready'. Skrypt wysyła dane do Google Analytics. W przypadku, gdy skrypt kończy działanie z powodzeniem, task przyjmuje ostatecznie status 'Done'. Jeśli wystąpi błąd to statusem końcowym jest 'Error Occured'.
 \end{enumerate}
 
 \subsubsection{Scenariusz neagtywny}
 \begin{enumerate}
-	\item Użytkownik jako argument podaje nierealną liczbę odwiedzeń w podanym przedziale czasu, niepoprawne Tracking ID\@. W takiej sytuacji aplikacja wypisuje na standardowe wyjście odpowiedni komunikat i oczekuje nowych danych.
 
-\item Użytkownik podaje poprawne argumenty, jednak liczba odwiedzeń w stosunku do wielkości przedziału czasu jest na tyle duża, że aplikacja nie jest w stanie wygenerować wiarygodnych danych, generujących oczekiwane statystyki. Wiarygodność danych jest określana na podstawie przeciętnego ruchu w sieci na terenie Polski. W takiej sytuacj aplikacja wypisuje na standardowe wyjście odpowiednie ostrzeżenie, z pytaniem czy użytkownik chce zmodyfikować argumenty.
+\item Użytkownik wypełnia formularz nierealną liczbą odwiedzeń w ogóle albo w podanym przedziale czasu bądź niepoprawny Tracking ID\@. W takiej sytuacji aplikacja webowa wypisuje odpowiedni komunikat i oczekuje nowych danych.
 
-\item W trakcie działania zostaje utracone połączenie z internetem. Aplikacja daje użytkownikowi możliwość wyboru jednej z 3 opcji:
-\begin{enumerate}
-\item po uzyskaniu połączenia generowanie dalej wejść
-\item po uzyskaniu połączenia rozpoczęcie ponownego generowania wejść
-\item zaniechanie generowania.
-\end{enumerate}
+\item Aplikacja uruchamia skrypt, ale kończy on działanie z błędem, na przykład ze względu na utracone połączenie z Internetem. W takiej sytuacji task ma przypisany status 'Error occured'.
+
 
 \end{enumerate}
 
