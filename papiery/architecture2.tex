@@ -65,16 +65,20 @@ Jako systemem do zarządzania bazą użyjemy SQLite. Baza będzie zawierała dwi
 \subsection{Backend aplikacji}
 Słuzy do komunkacji między \textbf{UI}, a \textbf{bazą}. Użyjemy do tego frameworka \textbf{Flask}. Będziemy używać widoków:
 \begin{itemize}
-\item widok pod adresem "/tasks" z metodą \textbf{GET} wyświetlający listę wszystkich zadań
-\item widok pod adresem "/tasks" z metodą \textbf{POST}, który będzie dodawał nowe zadanie do bazy, odświeżał listę wyświetlonych zadań i wyświetlał formularz
-\item widok pod adresem "/tasks/save" z metodą \textbf{POST}, który będzie aktualizował wybrane zadanie i dodatkowo walidował czy został podany poprawny \textbf{tracking\_id}
+\item widok pod adresem ``/tasks'' z metodą \textbf{GET} wyświetlający listę wszystkich zadań
+\item widok pod adresem ``/tasks'' z metodą \textbf{POST}, który będzie dodawał nowe zadanie do bazy, odświeżał listę wyświetlonych zadań i wyświetlał formularz
+\item widok pod adresem ``/tasks/save'' z metodą \textbf{POST}, który będzie aktualizował wybrane zadanie i dodatkowo walidował czy został podany poprawny \textbf{tracking\_id}
 \end{itemize}
 
 \subsection{System kolejkowania}
 \subsubsection{Język}
 Python 3.6. 
+\subsubsection{Użyte biblioteki}
+\begin{itemize}
+	\item \textbf{multiprocessing}: Tworzenie nowych procesów wysyłających dane do GA, oraz zarządzanie nimi.
+\end{itemize}
 \subsubsection{Opis działania}
-Skrypt, który co 1 minutę będzie wysyłał zapytania do bazy pobierając dane.
+Skrypt, który co 1 minutę będzie wysyłał zapytania do bazy pobierając dane. Skrypt będzie sprawdzał, czy należy uruchomić kolejny proces (czy rozpoczęło się właśnie nowe zadanie), czy jakiś działający proces należy przerwać (użytkownik go anulował), oraz monitorował działanie wszystkich procesów i aktualizował w bazie danych ich stan w przypadku jego zmiany --- zakończenia działania (sukces lub błąd).
 
 \subsection{Skrypt do wysyłania zapytań do GA}
 
@@ -93,9 +97,9 @@ Wykorzystany zostanie Python w wersji 3.6.
 API służące do komunkacji z GA, generuje potrzebne dane oraz je wysyła.
 Dostępne metody:
 \begin{itemize}
-\item \textbf{send(tracking\_id, url, visits\_no, time)}: Przekazuje dane do niżej opisanej funkcji \textbf{generate\_data}. Po odebraniu wygenerowanych danych, próbuje przesłać je bezpośrednio do GA\@. Przykładowe wysłanie danych: \textbf{requests.post("https://www.google-analytics.com/\\collect", data={"v":  1, "t": "pageview", "tid": tracking\_id, "cid": 1, "dp": url})}. W ten sposób będziemy wysyłać w pętli kolejne wejścia z wygenerowanych danych. Zwraca kod \textbf{OK}, po wygenerowaniu wszystkich danych.
+\item \textbf{send (tracking\_id, url, visits\_no, time)}: Przekazuje dane do niżej opisanej funkcji \textbf{generate\_data}. Po odebraniu wygenerowanych danych, próbuje przesłać je bezpośrednio do GA\@. Przykładowe wysłanie danych: \textbf{requests.post (``https://www.google-analytics.com/\\collect'', data={``v'':  1, ``t'': ``pageview'', ``tid'': tracking\_id, ``cid'': 1, ``dp'': url})}. W ten sposób będziemy wysyłać w pętli kolejne wejścia z wygenerowanych danych. Zwraca kod \textbf{OK}, po wygenerowaniu wszystkich danych.
 
-\item \textbf{generate\_data(visits\_no)}: metoda wołana przez \textbf{send()}, generujące odpowiednie dane do wysłania. Po odebraniu informacji przekazanych przez użytkownika, do odpowiedniej ilości zapytań przypisuje dane przygotowane z wiarygodnym rozkładem. Informacje do tego potrzebne zostaną zczytane z pliku `browser.csv', który zostanie pobrany ze strony \href{http://gs.statcounter.com/browser-version-market-share/all/poland#monthly-201703-201803-bar}{GlobalStats StatCounter (dane\ dot.\ oprogramowania\ użytkowników\ witryny)}. Informacje te zostaną przypisane na zmienną \textbf{distribution\_informations} będącą typu DataFrame. Zostanie to wykonane tylko raz.
+\item \textbf{generate\_data (visits\_no)}: metoda wołana przez \textbf{send ()}, generujące odpowiednie dane do wysłania. Po odebraniu informacji przekazanych przez użytkownika, do odpowiedniej ilości zapytań przypisuje dane przygotowane z wiarygodnym rozkładem. Informacje do tego potrzebne zostaną zczytane z pliku `browser.csv', który zostanie pobrany ze strony \href{http://gs.statcounter.com/browser-version-market-share/all/poland#monthly-201703-201803-bar}{GlobalStats StatCounter (dane\ dot.\ oprogramowania\ użytkowników\ witryny)}. Informacje te zostaną przypisane na zmienną \textbf{distribution\_informations} będącą typu DataFrame. Zostanie to wykonane tylko raz.
 \end{itemize}
 
 \subsubsection{Wykres użytkowania przeglądarek na terenie Polski}
@@ -105,7 +109,7 @@ Dostępne metody:
 
 \begin{itemize}
 \item \textbf{przekazanie danych}:
-Użytkownika wywołuję funkcję \textbf{send(tracking\_id, url, visits\_no, time)} udostępnioną przez \textbf{send\_requests\_api}. W rezultacie otrzymuje komunikat tego czy udało się pomyślnie wysłać żądanie.
+Użytkownika wywołuję funkcję \textbf{send (tracking\_id, url, visits\_no, time)} udostępnioną przez \textbf{send\_requests\_api}. W rezultacie otrzymuje komunikat tego czy udało się pomyślnie wysłać żądanie.
 
 \begin{center}\includegraphics[scale=0.5]{put_data}\end{center}
 
