@@ -81,7 +81,7 @@ Python 3.6.
 	\item \textbf{multiprocessing}: Tworzenie nowych procesów wysyłających dane do GA, oraz zarządzanie nimi, w szczególności udostępnia metodę przerywającą dany proces (wysyła SIGTERM).
 \end{itemize}
 \subsubsection{Opis działania}
-Skrypt, który co 1 minutę będzie wysyłał zapytania do bazy pobierając dane. Skrypt będzie sprawdzał, czy należy uruchomić kolejny proces (czy rozpoczęło się właśnie nowe zadanie), czy jakiś działający proces należy przerwać (użytkownik go anulował), oraz monitorował działanie wszystkich procesów i aktualizował w bazie danych ich stan w przypadku jego zmiany --- zakończenia działania (sukces lub błąd).
+Skrypt, który co 1 minutę będzie wysyłał zapytania do bazy pobierając dane. Skrypt będzie sprawdzał, czy należy uruchomić kolejny proces (czy rozpoczęło się właśnie nowe zadanie), czy jakiś działający proces należy przerwać (użytkownik go anulował), oraz monitorował działanie wszystkich procesów i aktualizował w bazie danych ich stan w przypadku jego zmiany --- zakończenia działania (sukces lub błąd). Przerywanie będzie wykonywane poprzez wysłanie do procesu sygnału SIGTERM (proces będzie obsługiwał ten sygnał aby nie dopuścić do wycieku zasobów).
 
 \subsection{Skrypt do wysyłania zapytań do GA}
 
