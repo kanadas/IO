@@ -4,7 +4,7 @@
 \usepackage{polski}
 \usepackage{titlesec}
 
-\title{Generator ruchu Google Analytics \\ Iteracja I specyfikacja wymagań}
+\title{Generator ruchu Google Analytics \\ Iteracja II specyfikacja wymagań}
 \author{Bartłomiej Dalak \and Bartłomiej Karwowski \and Bartosz Gromek \and Tomasz Kanas}
 
 \begin{document}
@@ -70,7 +70,7 @@ Użytkownik posiada na swoim koncie Google Analytics tyle dodatkowych odwiedzeń
 \begin{enumerate}
 \item Użytkownik wchodzi na stronę i wypełnia formularz.
 \item Strona weryfikuje poprawność danych. Jeśli nie są poprawne to wypisywany jest stosowny komunikat.
-\item W przeciwnym przypadku w tabeli pojawia się nowy wiersz ze statusem 'Ready'. W danym przez użytkownika dniu i godzinie uruchamiany jest skrypt z odpowiednimi argumentami. Wtedy status  w tabeli zmienia się na 'Ready'. Skrypt wysyła dane do Google Analytics. W przypadku, gdy skrypt kończy działanie z powodzeniem, task przyjmuje ostatecznie status 'Done'. Jeśli wystąpi błąd to statusem końcowym jest 'Error Occured'.
+\item W przeciwnym przypadku w tabeli pojawia się nowy wiersz ze statusem 'Ready'. W danym przez użytkownika dniu i godzinie uruchamiany jest skrypt z odpowiednimi argumentami. Wtedy status  w tabeli zmienia się na 'In progress'. Skrypt wysyła dane do Google Analytics. W przypadku, gdy skrypt kończy działanie z powodzeniem, task przyjmuje ostatecznie status 'Done'. Jeśli wystąpi błąd to statusem końcowym jest 'Error Occured'.
 \end{enumerate}
 
 \subsubsection{Scenariusz neagtywny}
