@@ -78,7 +78,7 @@ Słuzy do komunkacji między \textbf{UI}, a \textbf{bazą}. Użyjemy do tego fra
 Python 3.6. 
 \subsubsection{Użyte biblioteki}
 \begin{itemize}
-	\item \textbf{multiprocessing}: Tworzenie nowych procesów wysyłających dane do GA, oraz zarządzanie nimi.
+	\item \textbf{multiprocessing}: Tworzenie nowych procesów wysyłających dane do GA, oraz zarządzanie nimi, w szczególności udostępnia metodę przerywającą dany proces (wysyła SIGTERM).
 \end{itemize}
 \subsubsection{Opis działania}
 Skrypt, który co 1 minutę będzie wysyłał zapytania do bazy pobierając dane. Skrypt będzie sprawdzał, czy należy uruchomić kolejny proces (czy rozpoczęło się właśnie nowe zadanie), czy jakiś działający proces należy przerwać (użytkownik go anulował), oraz monitorował działanie wszystkich procesów i aktualizował w bazie danych ich stan w przypadku jego zmiany --- zakończenia działania (sukces lub błąd).
