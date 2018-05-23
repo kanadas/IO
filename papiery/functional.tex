@@ -1,94 +1,118 @@
 \documentclass{article}
 
-\usepackage[utf8]{inputenc}
-\usepackage{polski}
-\usepackage{titlesec}
+    \usepackage[utf8]{inputenc}
+    \usepackage{polski}
+    \usepackage{titlesec}
+    
+    \title{Generator ruchu Google Analytics \\ Iteracja II specyfikacja wymagań}
+    \author{Bartłomiej Dalak \and Bartłomiej Karwowski \and Bartosz Gromek \and Tomasz Kanas}
+    
+    \begin{document}
+    \maketitle
+    
+    \section{Opis ogólny}
+    \begin{itemize}
+    \item Celem pierwszej iteracji jest napisanie skryptu generującego statystyki odwiedzania danej strony w podanym przez użytownika przedziale czasu w Google Analytics.
+    \item Celem drugiej iteracji jest stworzenie systemu kolejkowania uruchomień skryptu o określonej godzinie, wraz z interfejsem użytkownika w postaci aplikacji webowej.
+    \end{itemize}
 
-\title{Generator ruchu Google Analytics \\ Iteracja II specyfikacja wymagań}
-\author{Bartłomiej Dalak \and Bartłomiej Karwowski \and Bartosz Gromek \and Tomasz Kanas}
+    \vspace{7\baselineskip}
 
-\begin{document}
-\maketitle
+    \section{Wymagania funkcjonalne}
+    
+    Aplikacja ma umożliwić użytkownikowi wypełnienie formularza, którego efektem końcowym będzie przesłanie do Google Analytics oczekiwanych statystyk dotyczących odwiedzeń danej strony. Konieczne do tego jest posiadanie przez użytkownika poprawnie skonfigurowanego konta w Google Analytics. Aplikacja ma za zadanie utworzenie oraz edytowanie procesu generującego w Google Analytics statystyki przedstawiające zdefiniowaną przez użytkownika ilość odwiedzeń strony w przeciągu podanego przedziału czasu. Głównym panelem zarządzania aplikacji będzie prosty formularz do dodawania tasków reprezentujących pojedyńcze uruchomienie skryptu w określonym dniu i godzinie. Z jego pomocą, klikając odpowiednie przyciski zawarte w formularzu, użytkownik będzie w stanie dodawać nowe taski, a także edytować lub usuwać/anulować już istniejące. W danej chwili do każdego z tasków obecnych w aplikacji będzie przypisany jeden z siedmu możliwych stanów, informujących o jego statusie:
+    
+    \begin{itemize}
+        \item New -- zadanie dodane do bazy
+        \item Ready -- zadanie zapisane, czekające na wykonanie
+        \item In progress -- zadanie w trakcie wykonywania
+        \item Cancelled -- zadanie zatrzymane
+        \item Deleted -- zadanie usunięte, zanim zaczęło się wykonywać
+        \item Done -- zadanie zostało wykonane
+        \item Error -- wystąpiły problemy w trakcie wysyłania
+        \end{itemize}
+    
+    Naciśnięcie przycisku 'Add new' utworzy nowy task o statusie 'New'. Po wprowadzeniu danych można go zapisać, naciskając przycisk 'Save'. Użytkownik, wypełniając formularz, musi podać następujące dane:
+    
+    \begin{itemize}
+    \item Tracking ID --- identyfikator konta w Google Analytics
+    \item URL --- względny adres strony, tzn. adres podstrony (url'a przypisanego do Tracking ID), która ma mieć zarejestrowane wyświetlenia.
+    \item Ilość odwiedzeń
+    \item Wielkość przedziału czasu (w s)
+    \item Datę i godzinę.
+    \end{itemize}
 
-\section{Opis ogólny}
-\begin{itemize}
-\item Celem pierwszej iteracji jest napisanie skryptu generującego statystyki odwiedzania danej strony w podanym przez użytownika przedziale czasu w Google Analytics.
-\item Celem drugiej iteracji jest stworzenie systemu kolejkowania uruchomień skryptu o określonej godzinie, wraz z interfejsem użytkownika w postaci aplikacji webowej.
-\end{itemize}
+    \vspace{1\baselineskip}
+    
+    \subsection{Jakość}
+    Każdy dodany task będzie wysłany o konkretnym czasie, zdefiniowanym przez użytkownika. Aplikacja będzie pilnować podanych tasków i wysyłać statystyki do Google Analytics o odpowiedniej, podanej wcześniej godzinie. Aplikacja będzie wysyłać zapytania do usługi w przeciągu całego przedziału czasu podanego przez użytkownika. Ponadto odwiedzenia generowane są liniowo w całym przedziale czasu, z pewną wariancją --- z tego powodu ostateczna ilość odwiedzeń może się nieznacznie różnić od oczekiwanej. Różnica ta nie przekroczy 1\%.
 
-\section{Wymagania funkcjonalne}
+    \vspace{2\baselineskip}
+    
+    \subsection{Przykład użycia}
+    \begin{itemize}
+    \item Dodanie nowego taska. Użytkownik wypełnia formularz na stronie, po czym klika przycisk 'add new'. W tabeli tasków pojawia się nowy wiersz zawierający
+        id zlecenia, datę, liczbę wyświetleń, czas ich generowania oraz url strony dla której mają być przesłane. Jeśli skrypt wysyłający dane do GA nie zwróci żadnych błędów, to w momencie zakończenia generowania wyświetleń task zmieni status na 'Done', w przeciwnym wypadku jego status zmieni się na 'Error occured'.
+    \item Edycja taska. Dopóki task ma status 'Ready', to użytkownik może edytować jego wszystkie właściwości (poza id taska). Edycja następuje poprzez modyfikację pól w tabeli i kliknięcie przycisku 'save'.
+    \item Usunięcie taska. Przy każdym wierszu w tabeli, gdzie status jest 'Ready' albo 'In progress', aktywny jest przycisk w kształcie krzyżyka pozwalający na usunięcie/zatrzymanie działania taska (w zależności od jego statusu). Task ze statusu 'Ready' zmienia się na 'Deleted', 'In progress' na 'Canceled'.
+    \end{itemize}
+    
+    \subsubsection{Aktorzy}
+    \begin{itemize}
+    \item Użytkownik
+    \item Google Analytics
+    \end{itemize}
+    
+    \subsubsection{Dane wejściowe}
+    \begin{itemize}
+    \item Tracking ID
+    \item URL
+    \item Liczba odwiedzeń (z góry ustalonego przedziału)
+    \item Wielkość przedziału czasu (w s)
+    \item Data i godzina uruchomienia skryptu.
+    \end{itemize}
+    
+    \subsubsection{Warunki wstępne}
+    \begin{itemize}
+    \item Działające połączenie z internetem
+    \item Posiadanie strony internetowej
+    \item Posiadanie poprawnie skonfigurowanego konta w Google Analytics
+    \end{itemize}
+    
+    \subsubsection{Warunki końcowe}
+    Do serwera Google Analytics zostało wysłane dokładnie tyle odwiedzeń ile zostało przekazane jako parametr w podanym przedziale czasu.
+    
+    \subsubsection{Rezultat}
+    Użytkownik posiada na swoim koncie Google Analytics tyle dodatkowych odwiedzeń ile chciał, uwzględniających lokalizację i przeglądarkę odwiedzających.
+    
+    \subsubsection{Scenariusz główny}
+    \begin{enumerate}
+    \item Użytkownik wchodzi na stronę, dodaje nowy task klikając przycisk 'Add new' lub edytuje już istniejący ze stanem 'Ready', po czym wypełnia formularz.
 
-Aplikacja ma umożliwić użytkownikowi przesłanie do Google Analytics statystyk dotyczących odwiedzeń danej strony. Konieczne do tego jest posiadanie przez użytkownika poprawnie skonfigurowanego konta w Google Analytics. Aplikacja ma za zadanie wygenerować w Google Analytics statystyki przedstawiające zdefiniowaną przez użytkownika ilość odwiedzeń strony w przeciągu podanego przedziału czasu. Statystyki mają obejmować aplikacje klienckie (user agent) i lokalizację użytkowników (w obrębie Polski). Aplikacja posiadać będzie prosty formularz do dodawania tasków reprezentujących pojedyńcze uruchomienie skryptu w określonym dniu i godzinie. Użytkownik podaje w formularzu:
-\begin{itemize}
-\item Tracking ID --- identyfikator konta w Google Analytics
-\item URL --- względny adres strony, tzn. adres podstrony (url'a przypisanego do Tracking ID), która ma mieć zarejestrowane wyświetlenia.
-\item Ilość odwiedzeń
-\item Wielkość przedziału czasu (w s)
-\item Datę i godzinę.
-\end{itemize}
+    \item Strona weryfikuje poprawność danych. Jeśli nie są poprawne to wypisywany jest stosowny komunikat.
 
-\subsection{Jakość}
-Generowane przez aplikację statystyki dotyczące lokalizacji i aplikacji klienckich są realistyczne. Oznacza to, że rozkład generowanych lokalizacji jest zgodny z rozkładem gęstości zamieszkania na terenie Polski, a rozkład aplikacji klienckich --- z ich procentową popularnością w Polsce. Ponadto odwiedzenia generowane są liniowo w całym przedziale czasu, z pewną wariancją --- z tego powodu ostateczna ilość odwiedzeń może się nieznacznie różnić od oczekiwanej. Różnica ta nie przekroczy 1\%.
+    \item W przeciwnym przypadku w tabeli pojawia się nowy wiersz ze statusem 'Ready'. W danym przez użytkownika dniu i godzinie uruchamiany jest skrypt z odpowiednimi argumentami. Wtedy status  w tabeli zmienia się na 'In progress'. Skrypt wysyła dane do Google Analytics. W przypadku, gdy skrypt kończy działanie z powodzeniem, task przyjmuje ostatecznie status 'Done'. Jeśli wystąpi błąd to statusem końcowym jest 'Error Occured'.
+    \end{enumerate}
+    
+    \subsubsection{Scenariusz negatywny}
+    \begin{enumerate}
 
-\subsection{Przykład użycia}
-\begin{itemize}
-\item Dodanie nowego taska. Użytkownik wypełnia formularz na stronie, po czym klika przycisk 'add new'. W tabeli tasków pojawia się nowy wiersz zawierający
-    id zlecenia, datę, liczbę wyświetleń, czas ich generowania oraz url strony dla której mają być przesłane. Jeśli skrypt wysyłający dane do GA nie zwróci żadnych błędów, to w momencie zakończenia generowania wyświetleń task zmieni status na 'Done', w przeciwnym wypadku jego status zmieni się na 'Error occured'.
-\item Edycja taska. Dopóki task ma status 'Ready', to użytkownik może edytować jego wszystkie właściwości (poza id taska). Edycja następuje poprzez modyfikację pól w tabeli i kliknięcie przycisku 'save'.
-\item Usunięcie taska. Przy każdym wierszu w tabeli, gdzie status jest 'Ready' albo 'In progress', aktywny jest przycisk w kształcie krzyżyka pozwalający na usunięcie/zatrzymanie działania taska (w zależności od jego statusu). Task ze statusu 'Ready' zmienia się na 'Deleted', 'In progress' na 'Canceled'.
-\end{itemize}
-
-\subsubsection{Aktorzy}
-\begin{itemize}
-\item Użytkownik
-\item Google Analytics
-\end{itemize}
-
-\subsubsection{Dane wejściowe}
-\begin{itemize}
-\item Tracking ID
-\item URL
-\item Liczba odwiedzeń (z góry ustalonego przedziału)
-\item Wielkość przedziału czasu (w s)
-\item Data i godzina uruchomienia skryptu.
-\end{itemize}
-
-\subsubsection{Warunki wstępne}
-\begin{itemize}
-\item Działające połączenie z internetem
-\item Posiadanie strony internetowej
-\item Posiadanie poprawnie skonfigurowanego konta w Google Analytics
-\end{itemize}
-
-\subsubsection{Warunki końcowe}
-Do serwera Google Analytics zostało wysłane dokładnie tyle odwiedzeń ile zostało przekazane jako parametr w podanym przedziale czasu.
-
-\subsubsection{Rezultat}
-Użytkownik posiada na swoim koncie Google Analytics tyle dodatkowych odwiedzeń ile chciał, uwzględniających lokalizację i przeglądarkę odwiedzających.
-
-\subsubsection{Scenariusz główny}
-\begin{enumerate}
-\item Użytkownik wchodzi na stronę i wypełnia formularz.
-\item Strona weryfikuje poprawność danych. Jeśli nie są poprawne to wypisywany jest stosowny komunikat.
-\item W przeciwnym przypadku w tabeli pojawia się nowy wiersz ze statusem 'Ready'. W danym przez użytkownika dniu i godzinie uruchamiany jest skrypt z odpowiednimi argumentami. Wtedy status  w tabeli zmienia się na 'In progress'. Skrypt wysyła dane do Google Analytics. W przypadku, gdy skrypt kończy działanie z powodzeniem, task przyjmuje ostatecznie status 'Done'. Jeśli wystąpi błąd to statusem końcowym jest 'Error Occured'.
-\end{enumerate}
-
-\subsubsection{Scenariusz neagtywny}
-\begin{enumerate}
-
-\item Użytkownik wypełnia formularz nierealną liczbą odwiedzeń w ogóle albo w podanym przedziale czasu bądź niepoprawny Tracking ID\@. W takiej sytuacji aplikacja webowa wypisuje odpowiedni komunikat i oczekuje nowych danych.
-
-\item Aplikacja uruchamia skrypt, ale kończy on działanie z błędem, na przykład ze względu na utracone połączenie z Internetem. W takiej sytuacji task ma przypisany status 'Error occured'.
-
-
-\end{enumerate}
-
-\section{Wymagania niefunkcjonalne}
-
-\subsection{Wydajność}
-Aplikacja jest w stanie generować ponad tysiąc odwiedzeń na sekundę na maszynie z procesorem Intel Core i5--4570, 3.2GHz (8GB RAM) i łączem 20 MB/s.
-
-\subsection{Bezpieczeństwo}
-Aplikacja nie zapisuje żadnych danych użytkownika i wszystkie dane przesyłane są poprzez szyfrowane połączenie (HTTPS).
-
-\end{document}
+    \item Użytkownik nie wypełnia części/całego formularza. W takim przypadku aplikacja prosi jeszcze raz o wypełnienie wszystkich jego pól.
+    
+    \item Użytkownik wypełnia formularz nierealną liczbą odwiedzeń w ogóle albo w podanym przedziale czasu bądź niepoprawny Tracking ID\@. W takiej sytuacji aplikacja webowa wypisuje odpowiedni komunikat i oczekuje nowych danych.
+    
+    \item Użytkownik próbuje edytować task ze stanem 'Deleted', 'Cancelled' lub 'Done'. W takim przypadku aplikacja nie pozwala mu na to, wypisując odpowiedni komunikat.
+    
+    
+    \end{enumerate}
+    
+    \section{Wymagania niefunkcjonalne}
+    
+    \subsection{Wydajność}
+    Aplikacja jest w stanie generować ponad tysiąc odwiedzeń na sekundę na maszynie z procesorem Intel Core i5--4570, 3.2GHz (8GB RAM) i łączem 20 MB/s.
+    
+    \subsection{Bezpieczeństwo}
+    Aplikacja nie zapisuje żadnych danych użytkownika i wszystkie dane przesyłane są poprzez szyfrowane połączenie (HTTPS).
+    
+    \end{document}
+    
