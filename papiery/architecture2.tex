@@ -44,6 +44,13 @@ Użytkownik po wejściu na stronę zobaczy po lewej stronie listę wszystkich za
 \subsubsection{Przejścia stanów}
 \begin{center}\includegraphics[scale=0.5]{states_diagram}\end{center}
 
+\subsection{Niedozwolone przejścia między stanami}
+Może się zdarzyć, że użytkownik spróbuje przejść między stanami, dla których nie ma połączenia. Zostanie wtedy on poinformowany, że danej akcji nie można wykonać. Niedozwolone przejścia:
+\begin{itemize}
+\item \textbf{IN PROGRESS}, a \textbf{READY}: może się to zdarzyć, gdy użytkownik utworzy zadanie, zacznie ono się wykonywać, a on spróbuje je edytować, ponieważ nie odświeżył widoku. Wtedy zostanie on poinformowany, że nie mozna edytować trwającego zadania
+\item \textbf{IN PROGRESS}, a \textbf{DELETED}: analogiczna sytuacja jak wyżej tylko tym razem użytkownik próbuje usunąć zadanie
+\end{itemize}
+
 \subsection{Baza danych}
 
 Jako systemem do zarządzania bazą użyjemy SQLite. Baza będzie zawierała dwie tabele:
@@ -128,11 +135,6 @@ Po otrzymaniu wygenerowanych danych zostają one wysyłane do Google Analytics, 
 \end{itemize}
 
 \section{Komunikacja między elementami}
-\subsection{UI, backend aplikacji i baza danych}
 \begin{center}\includegraphics[scale=0.5]{ui_b}\end{center}
-
-\subsection{System kolejkowania, baza danych i skrypt}
-\begin{center}\includegraphics[scale=0.5]{system}\end{center}
-
 
 \end{document}
