@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% for task in tasks %}
+        <li>{{ task.tracking_id }}</li>
+    {% endfor %}
+    <form method="post">
+        <label for="tracking_id">tracking_id</label>
+        <input name="tracking_id" id="tracking_id" required>
+
+        <label for="url">url</label>
+        <input name="url" id="url" required>
+
+        <label for="time">time</label>
+        <input name="time" id="time" required>
+
+        <label for="visits">visits</label>
+        <input name="visits" id="visits" required>
+
+        <label for="date">date</label>
+        <input type="date" name="date" id="date" required>
+
+        <input type="submit" value="Add new">
+    </form>
+{% endblock %}
