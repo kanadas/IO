@@ -1,0 +1,29 @@
+{% extends 'display_tasks.html' %}
+
+{% block add_task %}
+
+<form id="new_task" method="post">
+    <label for="tracking_id">tracking_id</label>
+    <input name="tracking_id" id="tracking_id" required>
+    <br>
+
+    <label for="url">url</label>
+    <input name="url" id="url" required>
+    <br>
+
+    <label for="time">time</label>
+    <input name="time" id="time" required>
+    <br>
+
+    <label for="visits">visits</label>
+    <input name="visits" id="visits" required>
+    <br>
+
+    <label for="date">date</label>
+    <input type="date" name="date" id="date" required>
+    <br>
+
+    <input id="submit_new_task" type="submit" value="Add new">
+</form>
+
+{% endblock %}

@@ -1,25 +1,44 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {% for task in tasks %}
-        <li>{{ task.tracking_id }}</li>
-    {% endfor %}
-    <form method="post">
-        <label for="tracking_id">tracking_id</label>
-        <input name="tracking_id" id="tracking_id" required>
-
-        <label for="url">url</label>
-        <input name="url" id="url" required>
-
-        <label for="time">time</label>
-        <input name="time" id="time" required>
-
-        <label for="visits">visits</label>
-        <input name="visits" id="visits" required>
-
-        <label for="date">date</label>
-        <input type="date" name="date" id="date" required>
-
-        <input type="submit" value="Add new">
-    </form>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h1>Scheduler</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 text-center">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                          <th scope="col">Task_id</th>
+                          <th scope="col">State</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <th class="col-md-6">{{ task.tracking_id }}</th>
+                            <th class="col-md-6">{{ task.state_name }}</th>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6 text-center">
+                {% block add_task %}{%endblock%}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <button id="remove_tasks">Remove all tasks</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById("remove_tasks").onclick = () => {
+            window.location.replace("/clear_tasks");
+        };
+    </script>
 {% endblock %}

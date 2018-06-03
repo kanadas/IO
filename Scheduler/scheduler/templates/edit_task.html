@@ -1,0 +1,34 @@
+{% block edit_task %}
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th class="col-md-6">Task id</th>
+                <th class="col-md-6">{{ task.task_id }}</th>
+            </tr>
+            <tr>
+                <th class="col-md-6">State</th>
+                <th class="col-md-6">{{ task.state_name }}</th>
+            </tr>
+            <tr>
+                <th class="col-md-6">Tracking id</th>
+                <th class="col-md-6">{{ task.tracking_id }}</th>
+            </tr>
+            <tr>
+                <th class="col-md-6">Url</th>
+                <th class="col-md-6">{{ task.url }}</th>
+            </tr>
+            <tr>
+                <th class="col-md-6">Generating time</th>
+                <th class="col-md-6">{{ task.generating_time }}</th>
+            </tr>
+            <tr>
+                <th class="col-md-6">Visits</th>
+                <th class="col-md-6">{{ task.visits }}</th>
+            </tr>
+            <tr>
+                <th class="col-md-6">Start time</th>
+                <th class="col-md-6">{{ task.start_time }}</th>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}
