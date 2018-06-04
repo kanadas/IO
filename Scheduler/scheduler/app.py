@@ -1,5 +1,6 @@
 import os
 
+from datetime import datetime
 from scheduler.db import get_db
 from . import db
 from flask import Flask, render_template, request, redirect
@@ -39,11 +40,6 @@ def tasks():
     dbs = get_db()
 
     if request.method == 'POST':
-        # tracking_id = request.form['tracking_id']
-        # url = request.form['url']
-        # time = request.form['time']
-        # visits = request.form['visits']
-        # date = request.form['date']
         cursor = dbs.cursor()
         cursor.execute(
             'INSERT INTO task (tracking_id, url, generating_time, state_name, visits, start_time)'
@@ -55,7 +51,7 @@ def tasks():
 
         dbs.commit()
 
-        return redirect('/task/%d' % task_id)
+        return redirect('/tasks/%d' % task_id)
 
     else:
         all_tasks = dbs.execute(
@@ -75,23 +71,33 @@ def task(task_id):
         url = request.form['url']
         time = request.form['time']
         visits = request.form['visits']
-        date = request.form['date']
+        date = datetime.strptime(request.form['date'], "%Y-%m-%dT%H:%M")
+
         dbs.execute(
-            'INSERT INTO task (tracking_id, url, generating_time, state_name, visits, start_time)'
-            ' VALUES (?, ?, ?, ?, ?, ?)',
-            (tracking_id, url, time, 'READY', visits, date)
+            'UPDATE task SET tracking_id=?, url=?, generating_time=?, state_name=?, visits=?, start_time=?'
+            ' WHERE task_id=?',
+            (tracking_id, url, time, 'READY', visits, date, task_id)
         )
         dbs.commit()
 
         return redirect('/tasks')
-
     else:
         all_tasks = dbs.execute(
-            'SELECT rowid, tracking_id, state_name'
+            'SELECT task_id, tracking_id, state_name'
             ' FROM task'
         ).fetchall()
 
-        return render_template('edit_task.html', tasks=all_tasks)
+        current_task = dbs.execute(
+            'SELECT task_id, tracking_id, url, generating_time, visits, start_time'
+            ' FROM task'
+            ' WHERE task_id=?', (task_id,)
+        ).fetchone()
+
+        if current_task['start_time']:
+            current_task['start_time'] = datetime.strptime(current_task['start_time'], "%Y-%m-%d %H:%M:%S")
+            current_task['start_time'] = datetime.strftime(current_task['start_time'], "%Y-%m-%dT%H:%M")
+
+        return render_template('edit_task.html', tasks=all_tasks, current_task=current_task)
 
 
 @app.route('/clear_tasks')
