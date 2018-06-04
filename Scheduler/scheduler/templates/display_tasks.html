@@ -12,13 +12,15 @@
                 <table class="table table-bordered table-hover">
                     <thead class="thead-dark">
                         <tr>
-                          <th scope="col">Task_id</th>
-                          <th scope="col">State</th>
+                            <th scope="col">Task_id</th>
+                            <th scope="col">Tracking id</th>
+                            <th scope="col">State</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for task in tasks %}
-                        <tr>
+                        <tr onclick=window.location.replace("{{ '/tasks/%d' % task.task_id }}")>
+                            <th class="col-md-6">{{ task.task_id }}</th>
                             <th class="col-md-6">{{ task.tracking_id }}</th>
                             <th class="col-md-6">{{ task.state_name }}</th>
                         </tr>
@@ -27,14 +29,17 @@
                 </table>
             </div>
             <div class="col-md-6 text-center">
-                {% block add_task %}{%endblock%}
+                {% block edit_task %}{%endblock%}
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <button id="remove_tasks">Remove all tasks</button>
-            </div>
-        </div>
+        <span>
+            <form method="post" action="/tasks">
+                <button type="submit" id="add_new_task">Add new task</button>
+            </form>
+        </span>
+        <span>
+            <button id="remove_tasks">Remove all tasks</button>
+        </span>
     </div>
     <script>
         document.getElementById("remove_tasks").onclick = () => {

@@ -1,8 +1,9 @@
 import uuid
-from user_agent import generate_user_agents, load_statistics
-from user_geo import generate_geoids
+from .user_agent import generate_user_agents, load_statistics
+from .user_geo import generate_geoids
 
 statistics = load_statistics()
+
 
 class User:
     def __init__(self, agent, geoid):

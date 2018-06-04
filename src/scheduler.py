@@ -1,5 +1,5 @@
 from multiprocessing import Process
-from generate_ga_traffic import generate_ga_traffic
+from src.generate_ga_traffic import generate_ga_traffic
 import sqlite3
 import time
 
@@ -7,7 +7,7 @@ conn = sqlite3.connect('../Scheduler/instance/scheduler.sqlite')
 cur = conn.cursor()
 running_tasks = {}
 
-while(True):
+while True:
     for row in cur.execute("SELECT task_id, tracking_id, url, visits, generating_time FROM task WHERE start_time <= datetime('now') AND state_name = 'READY'"):
         proc = Process(target=generate_ga_traffic, args= row[1:5])
         proc.start()
