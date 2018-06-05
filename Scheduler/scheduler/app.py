@@ -73,14 +73,20 @@ def task(task_id):
         visits = request.form['visits']
         date = datetime.strptime(request.form['date'], "%Y-%m-%dT%H:%M")
 
-        dbs.execute(
-            'UPDATE task SET tracking_id=?, url=?, generating_time=?, state_name=?, visits=?, start_time=?'
-            ' WHERE task_id=?',
-            (tracking_id, url, time, 'READY', visits, date, task_id)
-        )
-        dbs.commit()
+        task = dbs.execute('SELECT state_name FROM task WHERE task_id=?', (task_id,)).fetchone()
 
-        return redirect('/tasks')
+        if task['state_name'] == 'NEW' or task['state_name'] == 'READY':
+            dbs.execute(
+                'UPDATE task SET tracking_id=?, url=?, generating_time=?, state_name=?, visits=?, start_time=?'
+                ' WHERE task_id=?',
+                (tracking_id, url, time, 'READY', visits, date, task_id)
+            )
+            dbs.commit()
+
+            return redirect('/tasks')
+        elif task['state_name'] == 'IN_PROGRESS':
+            pass
+            #TODO zrobic formularz edytowania jako Form i dodac jego walidacje
     else:
         all_tasks = dbs.execute(
             'SELECT task_id, tracking_id, state_name'
@@ -88,7 +94,7 @@ def task(task_id):
         ).fetchall()
 
         current_task = dbs.execute(
-            'SELECT task_id, tracking_id, url, generating_time, visits, start_time'
+            'SELECT task_id, tracking_id, url, generating_time, visits, start_time, state_name'
             ' FROM task'
             ' WHERE task_id=?', (task_id,)
         ).fetchone()
