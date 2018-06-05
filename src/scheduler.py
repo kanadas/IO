@@ -8,7 +8,7 @@ cur = conn.cursor()
 running_tasks = {}
 
 while True:
-    for row in cur.execute("SELECT task_id, tracking_id, url, visits, generating_time FROM task WHERE start_time <= datetime('now') AND state_name = 'READY'"):
+    for row in cur.execute("SELECT task_id, tracking_id, url, visits, generating_time FROM task WHERE start_time <= datetime('now', 'localtime') AND state_name = 'READY'"):
         proc = Process(target=generate_ga_traffic, args= row[1:5])
         proc.start()
         running_tasks[row[0]] = proc
