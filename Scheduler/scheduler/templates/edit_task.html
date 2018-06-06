@@ -10,25 +10,25 @@
     <label for="tracking_id">tracking_id</label>
     <input name="tracking_id" id="tracking_id" value="{{ current_task.tracking_id}}" required
             {% if current_task.state_name == 'DONE' or current_task.state_name == 'CANCELED'
-                or current_task.state_name == 'DELETED' %} readonly {% endif %} >
+                or current_task.state_name == 'DELETED' or current_task.state_name == 'IN_PROGRESS' %} readonly {% endif %} >
     <br>
 
     <label for="url">url</label>
     <input name="url" id="url" value="{{ current_task.url }}" required
            {% if current_task.state_name == 'DONE' or current_task.state_name == 'CANCELED'
-                or current_task.state_name == 'DELETED'%} readonly {% endif %}>
+                or current_task.state_name == 'DELETED' or current_task.state_name == 'IN_PROGRESS' %} readonly {% endif %}>
     <br>
 
     <label for="time">time</label>
     <input name="time" id="time" value="{{ current_task.generating_time }}" required
            {% if current_task.state_name == 'DONE' or current_task.state_name == 'CANCELED'
-                or current_task.state_name == 'DELETED'%} readonly {% endif %}>
+                or current_task.state_name == 'DELETED' or current_task.state_name == 'IN_PROGRESS' %} readonly {% endif %}>
     <br>
 
     <label for="visits">visits</label>
     <input name="visits" id="visits" value="{{ current_task.visits }}" required
            {% if current_task.state_name == 'DONE' or current_task.state_name == 'CANCELED'
-                or current_task.state_name == 'DELETED' %} readonly {% endif %}>
+                or current_task.state_name == 'DELETED' or current_task.state_name == 'IN_PROGRESS' %} readonly {% endif %}>
     <br>
 
     <label for="date">date</label>
@@ -36,11 +36,11 @@
            value="{{ current_task.start_time }}"
            required
            {% if current_task.state_name == 'DONE' or current_task.state_name == 'CANCELED'
-            or current_task.state_name == 'DELETED' %} readonly {% endif %}>
+            or current_task.state_name == 'DELETED' or current_task.state_name == 'IN_PROGRESS' %} readonly {% endif %}>
     <br>
 
     {% if not (current_task.state_name == 'DONE' or current_task.state_name == 'CANCELED'
-            or current_task.state_name == 'DELETED') %}
+            or current_task.state_name == 'DELETED' or current_task.state_name == 'IN_PROGRESS') %}
         <input id="submit_task" type="submit" value="Save">
     {% endif %}
 </form>

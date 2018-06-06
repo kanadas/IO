@@ -77,7 +77,7 @@ def edit_template(dbs, task_id, errors):
 
     if current_task['start_time']:
         current_task['start_time'] = datetime.strptime(current_task['start_time'], "%Y-%m-%d %H:%M:%S")
-        current_task['start_time'] = datetime.strftime(current_task['start_time'], "%Y-%m-%d %H:%M")
+        current_task['start_time'] = datetime.strftime(current_task['start_time'], "%Y-%m-%dT%H:%M")
 
     return render_template('edit_task.html', tasks=all_tasks, current_task=current_task, errors=errors)
 
@@ -91,7 +91,7 @@ def task(task_id):
         url = request.form['url']
         time = request.form['time']
         visits = request.form['visits']
-        date = datetime.strptime(request.form['date'], "%Y-%m-%d %H:%M")
+        date = datetime.strptime(request.form['date'], "%Y-%m-%dT%H:%M")
         errors = None
 
         try:
@@ -105,7 +105,7 @@ def task(task_id):
             errors = "Connection problem encountered - try again or go cry"
         
         if not response.json()["hitParsingResult"][0]["valid"]:
-            errors = "Invalid data"
+            errors = "Wrong tracking_id"
     
         if errors:
             return edit_template(dbs, task_id, errors)
@@ -122,8 +122,8 @@ def task(task_id):
 
             return redirect('/tasks')
         elif task['state_name'] == 'IN_PROGRESS':
-            pass
-            #TODO zrobic formularz edytowania jako Form i dodac jego walidacje
+            errors = "You can't modify task in progress"
+            return edit_template(dbs, task_id, errors)
     else:
         return edit_template(dbs, task_id, None)
         
