@@ -5,6 +5,7 @@ from scheduler.db import get_db
 from . import db
 from flask import Flask, render_template, request, redirect
 from flask_bootstrap import Bootstrap
+import requests
 
 
 def create_app(test_config=None):
@@ -62,6 +63,25 @@ def tasks():
         return render_template('display_tasks.html', tasks=all_tasks)
 
 
+def edit_template(dbs, task_id, errors):
+    all_tasks = dbs.execute(
+        'SELECT task_id, tracking_id, state_name'
+        ' FROM task'
+    ).fetchall()
+
+    current_task = dbs.execute(
+        'SELECT task_id, tracking_id, url, generating_time, visits, start_time, state_name'
+        ' FROM task'
+        ' WHERE task_id=?', (task_id,)
+    ).fetchone()
+
+    if current_task['start_time']:
+        current_task['start_time'] = datetime.strptime(current_task['start_time'], "%Y-%m-%d %H:%M:%S")
+        current_task['start_time'] = datetime.strftime(current_task['start_time'], "%Y-%m-%d %H:%M")
+
+    return render_template('edit_task.html', tasks=all_tasks, current_task=current_task, errors=errors)
+
+
 @app.route('/tasks/<task_id>', methods=['POST', 'GET'])
 def task(task_id):
     dbs = get_db()
@@ -71,7 +91,24 @@ def task(task_id):
         url = request.form['url']
         time = request.form['time']
         visits = request.form['visits']
-        date = datetime.strptime(request.form['date'], "%Y-%m-%dT%H:%M")
+        date = datetime.strptime(request.form['date'], "%Y-%m-%d %H:%M")
+        errors = None
+
+        try:
+             response = requests.post("https://www.google-analytics.com/debug/collect", data={
+                 "tid": tracking_id,
+                 "dp": url,
+                 "v": 1,
+                 "cid": 1
+             }, timeout=60)
+        except (requests.Timeout, requests.ConnectionError):
+            errors = "Connection problem encountered - try again or go cry"
+        
+        if not response.json()["hitParsingResult"][0]["valid"]:
+            errors = "Invalid data"
+    
+        if errors:
+            return edit_template(dbs, task_id, errors)
 
         task = dbs.execute('SELECT state_name FROM task WHERE task_id=?', (task_id,)).fetchone()
 
@@ -88,23 +125,8 @@ def task(task_id):
             pass
             #TODO zrobic formularz edytowania jako Form i dodac jego walidacje
     else:
-        all_tasks = dbs.execute(
-            'SELECT task_id, tracking_id, state_name'
-            ' FROM task'
-        ).fetchall()
-
-        current_task = dbs.execute(
-            'SELECT task_id, tracking_id, url, generating_time, visits, start_time, state_name'
-            ' FROM task'
-            ' WHERE task_id=?', (task_id,)
-        ).fetchone()
-
-        if current_task['start_time']:
-            current_task['start_time'] = datetime.strptime(current_task['start_time'], "%Y-%m-%d %H:%M:%S")
-            current_task['start_time'] = datetime.strftime(current_task['start_time'], "%Y-%m-%dT%H:%M")
-
-        return render_template('edit_task.html', tasks=all_tasks, current_task=current_task)
-
+        return edit_template(dbs, task_id, None)
+        
 
 @app.route('/remove_tasks/<state>/<int:task_id>')
 def remove_task(state, task_id):

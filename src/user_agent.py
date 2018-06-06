@@ -16,7 +16,7 @@ class Distribution:
 ## Loads statistical data from files and returns it in format acceptable by generate_user_agents
 def load_statistics():
     devices = []
-    with open('../data/devices.csv', 'r', encoding='utf-8') as f:
+    with open('data/devices.csv', 'r', encoding='utf-8') as f:
         freader = csv.reader(f, dialect='excel', delimiter=',')
         devices = [[row[0].replace('"', '').lower(), float(row[1])] for row in freader]
     op_sys = {}
@@ -25,19 +25,19 @@ def load_statistics():
     browser_ver = {}
     for device in devices:
         dev = device[0]
-        with open('../data/os-' + dev + '.csv', 'r', encoding='utf-8') as f:
+        with open('data/os-' + dev + '.csv', 'r', encoding='utf-8') as f:
             freader = csv.reader(f, dialect='excel', delimiter=',')
             op_sys[dev] = [[row[0].strip().replace('"', '').lower(), float(row[1])] for row in freader]
         op_sys_ver[dev] = {}
         for operationsystem in op_sys[dev]:
             os = operationsystem[0]
-            with open('../data/' + os + '-version-' + dev + '.csv', 'r', encoding='utf-8') as f:
+            with open('data/' + os + '-version-' + dev + '.csv', 'r', encoding='utf-8') as f:
                 freader = csv.reader(f, dialect='excel', delimiter=',')
                 op_sys_ver[dev][os] = [[row[0].strip().replace('"', '').lower(), float(row[1])] for row in freader]
-        with open('../data/browser-' + dev + '.csv', 'r', encoding='utf-8') as f:
+        with open('data/browser-' + dev + '.csv', 'r', encoding='utf-8') as f:
             freader = csv.reader(f, dialect='excel', delimiter=',')
             browsers[dev] = [[row[0].strip().replace('"', '').lower(), float(row[1])] for row in freader]
-    with open('../data/browser-version.csv', 'r', encoding='utf-8') as f:
+    with open('data/browser-version.csv', 'r', encoding='utf-8') as f:
         freader = csv.reader(f, dialect='excel', delimiter=',')
         for row in freader:
             name = row[0].strip().replace('"', '').lower()

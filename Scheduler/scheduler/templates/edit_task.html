@@ -2,6 +2,10 @@
 
 {% block edit_task %}
 
+{% if errors %}
+	<div id = "errors">{{errors}}</div>
+{% endif %}
+
 <form id="edit_task" method="post">
     <label for="tracking_id">tracking_id</label>
     <input name="tracking_id" id="tracking_id" value="{{ current_task.tracking_id}}" required

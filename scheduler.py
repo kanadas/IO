@@ -3,7 +3,7 @@ from src.generate_ga_traffic import generate_ga_traffic
 import sqlite3
 import time
 
-conn = sqlite3.connect('../Scheduler/instance/scheduler.sqlite')
+conn = sqlite3.connect('Scheduler/instance/scheduler.sqlite')
 cur = conn.cursor()
 running_tasks = {}
 
