@@ -136,11 +136,11 @@ def remove_task(state, task_id):
             'DELETE FROM task'
             ' WHERE task_id=?', (task_id,)
         )
-    elif state in ['READY', 'IN PROGRESS']:
+    elif state in ['READY', 'IN_PROGRESS']:
         new_state = ''
         if state == 'READY':
             new_state = "DELETED"
-        if state == 'IN PROGRESS':
+        if state == 'IN_PROGRESS':
             new_state = 'CANCELED'
         dbs.execute(
             'UPDATE task SET state_name=?'
