@@ -15,14 +15,26 @@
                             <th scope="col">Task_id</th>
                             <th scope="col">Tracking id</th>
                             <th scope="col">State</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for task in tasks %}
-                        <tr onclick=window.location.replace("{{ '/tasks/%d' % task.task_id }}")>
+                        <tr>
                             <th class="col-md-6">{{ task.task_id }}</th>
                             <th class="col-md-6">{{ task.tracking_id }}</th>
                             <th class="col-md-6">{{ task.state_name }}</th>
+                            <th class="col-md-6">
+                                <button id="edit_task" onclick=window.location.replace("{{ '/tasks/%d' % task.task_id }}") >
+                                Edit
+                                </button>
+                            </th>
+                            <th class="col-md-6">
+                                <button id="remove_task" onclick=window.location.replace("{{ '/remove_tasks/%s/%d' % (task.state_name, task.task_id) }}") >
+                                    X
+                                </button>
+                            </th>
                         </tr>
                         {% endfor %}
                     </tbody>

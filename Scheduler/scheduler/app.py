@@ -106,6 +106,29 @@ def task(task_id):
         return render_template('edit_task.html', tasks=all_tasks, current_task=current_task)
 
 
+@app.route('/remove_tasks/<state>/<int:task_id>')
+def remove_task(state, task_id):
+    dbs = get_db()
+    if state in ['DELETED', 'ERROR', 'CANCELED', 'DONE']:
+        dbs.execute(
+            'DELETE FROM task'
+            ' WHERE task_id=?', (task_id,)
+        )
+    else:
+        new_state = ''
+        if state == 'READY':
+            new_state = "DELETED"
+        if state == 'IN PROGRESS':
+            new_state = 'CANCELED'
+        dbs.execute(
+            'UPDATE task SET state_name=?'
+            'WHERE task_id=?',
+            (new_state, task_id)
+        )
+    dbs.commit()
+    return redirect('/tasks')
+
+
 @app.route('/clear_tasks')
 def clear_tasks():
     dbs = get_db()

@@ -1,2 +1,1 @@
 states = ['READY', 'NEW', 'IN PROGRESS', 'CANCELED', 'DELETED', 'DONE', 'ERROR']
-
