@@ -114,7 +114,7 @@ def remove_task(state, task_id):
             'DELETE FROM task'
             ' WHERE task_id=?', (task_id,)
         )
-    else:
+    elif state in ['READY', 'IN PROGRESS']:
         new_state = ''
         if state == 'READY':
             new_state = "DELETED"
