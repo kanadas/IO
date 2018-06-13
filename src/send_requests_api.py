@@ -5,23 +5,6 @@ import time
 from .constants import WRONG_DATA, OK, CONNECTION_PROBLEM
 from .users import generate_users
 
-#do frontu trzeba przeniesc
-def check_data(tracking_id, url):
-    try:
-        response = requests.post("https://www.google-analytics.com/debug/collect", data={
-            "tid": tracking_id,
-            "dp": url,
-            "v": 1,
-            "cid": 1
-        }, timeout=60)
-    except (requests.Timeout, requests.ConnectionError):
-        return False, CONNECTION_PROBLEM
-
-    if response.json()["hitParsingResult"][0]["valid"]:
-        return True, OK
-    else:
-        return False, WRONG_DATA
-
 
 def generate_data(visits_no):
     return generate_users(visits_no)
