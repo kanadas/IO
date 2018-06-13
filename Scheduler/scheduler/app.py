@@ -79,7 +79,10 @@ def edit_template(dbs, task_id, errors):
         current_task['start_time'] = datetime.strptime(current_task['start_time'], "%Y-%m-%d %H:%M:%S")
         current_task['start_time'] = datetime.strftime(current_task['start_time'], "%Y-%m-%dT%H:%M")
 
-    return render_template('edit_task.html', tasks=all_tasks, current_task=current_task, errors=errors)
+    modify = (current_task['state_name'] == 'DONE' or current_task['state_name'] == 'CANCELED'
+                or current_task['state_name'] == 'DELETED' or current_task['state_name'] == 'IN_PROGRESS')
+
+    return render_template('edit_task.html', tasks=all_tasks, current_task=current_task, errors=errors, modify=modify)
 
 
 @app.route('/tasks/<task_id>', methods=['POST', 'GET'])
