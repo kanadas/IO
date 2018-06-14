@@ -1,3 +1,5 @@
+# Request sending API.
+
 import requests
 import random
 from math import floor, ceil
@@ -6,14 +8,12 @@ from .constants import WRONG_DATA, OK, CONNECTION_PROBLEM
 from .users import generate_users
 
 
-def generate_data(visits_no):
-    return generate_users(visits_no)
-
-
+# Main function sending the requests.
 def send(tracking_id, url, visits_no, sending_time):
-    data = generate_data(visits_no)
+    data = generate_users(visits_no)
     counter = 0;
 
+    # Sending the requested amount of users per minute.
     for i in range(sending_time):
         num = random.randint(floor((len(data) - counter) / (sending_time - i) / 1.5),
                              ceil((len(data) - counter) / (sending_time - i) * 1.5))
@@ -21,6 +21,7 @@ def send(tracking_id, url, visits_no, sending_time):
             num = len(data) - counter
         for id, user in enumerate(data[counter : counter + num]):
             try:
+                # Sending the request.
                 requests.post("https://www.google-analytics.com/collect", data={
                     "v": 1,
                     "tid": tracking_id,

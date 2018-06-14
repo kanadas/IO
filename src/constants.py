@@ -1,3 +1,5 @@
+# Constants used while sending requests.
+
 WRONG_DATA = -1
 OK = 0
 CONNECTION_PROBLEM = 1

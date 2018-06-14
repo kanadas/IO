@@ -1,28 +1,14 @@
+# The main script for Task sending.
+
 from .send_requests_api import send
 from .constants import OK, MAX_REQUESTS_PER_MINUTE
-
-
-def check_if_proper_number(num, msg):
-    is_int = True
-    try:
-        num_int = int(num)
-        if num_int < 0:
-            print("Only positive number of %s! %d" % (msg, num_int))
-            is_int = False
-    except ValueError:
-        is_int = False
-        print("%s has to be an integer!" % msg)
-    return is_int
 
 
 def generate_ga_traffic(tracking_id, url, visits_no, time):
     sending = True
     all_sent = 0
 
-    if visits_no / time > MAX_REQUESTS_PER_MINUTE:
-        print("We can't generate so much visits in that time")
-        exit(1)
-
+    # Loop sending the requests.
     while sending:
         result, sent_users = send(tracking_id, url, visits_no - all_sent, time)
         all_sent += sent_users

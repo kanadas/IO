@@ -1,8 +1,10 @@
+# Functions responsible for generating geolocalization data.
+
 import numpy as np
 
 
 # Geographic data (only cities with >50000 inhabitants)
-# Format: (location name, people inhabiting, criteria ID)
+# Format: (location name, inhabitants, criteria ID)
 geo_data = [
     # dolnośląskie
     ('Wrocław', 640000, 1011243),

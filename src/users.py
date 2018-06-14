@@ -12,6 +12,7 @@ class User:
         self.geoid = geoid
 
 
+# Generates the desired amount of users, together with all their data.
 def generate_users(visits_no):
     agents = generate_user_agents(statistics, visits_no)
     geoids = generate_geoids(visits_no)
